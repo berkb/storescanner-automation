@@ -215,7 +215,24 @@
     },
     {
       "parameters": {
-        "jsCode": "var LINKEDIN_CHANNEL = '69bbb1fe7be9f8b1717042b1';\nvar QUERY = 'mutation CreatePost($input: CreatePostInput!) { createPost(input: $input) { __typename ... on PostActionSuccess { post { id status dueAt } } ... on RestProxyError { message } } }';\n\n// Önceki node'dan: Parse Groq JSON \\u2192 caption / Generate Carousel PDF \\u2192 url'ler / Evaluate Slot \\u2192 targetSlot\nvar caption = ($('Parse Groq JSON').first().json.linkedinCaption || '').trim();\nvar carousel = $input.first().json || {};\nif (!carousel.pdfUrl || !carousel.thumbnailUrl) {\n  throw new Error('carousel-server response missing pdfUrl/thumbnailUrl');\n}\n\nvar slotCheck = $('Evaluate Slot').first().json.slotCheck;\nif (!slotCheck || !slotCheck.targetSlot) {\n  throw new Error('Slot check data missing \\u2014 did Evaluate Slot node run?');\n}\nvar dueAt = slotCheck.targetSlot;\n\n// Buffer CreatePostInput \\u2192 assets.documents = [{ url, title, thumbnailUrl }]\nvar bodyObj = {\n  query: QUERY,\n  variables: {\n    input: {\n      channelId: LINKEDIN_CHANNEL,\n      text: caption,\n      schedulingType: 'automatic',\n      mode: 'customScheduled',\n      dueAt: dueAt,\n      assets: {\n        document: {\n          url: carousel.pdfUrl,\n          title: carousel.title || 'Shopify Weekly Changelog',\n          thumbnailUrl: carousel.thumbnailUrl\n        }\n      }\n    }\n  }\n};\n\nvar bodyJson = JSON.stringify(bodyObj);\n\n// ASCII-safe JSON (emoji surrogate pair'leri HTTP layer'da bozulmas\\u0131n)\nvar safeBody = '';\nfor (var i = 0; i < bodyJson.length; i++) {\n  var code = bodyJson.charCodeAt(i);\n  if (code > 127) {\n    safeBody += '\\x5cu' + ('0000' + code.toString(16)).slice(-4);\n  } else {\n    safeBody += bodyJson[i];\n  }\n}\n\nreturn [{\n  json: {\n    body: safeBody,\n    dueAt: dueAt,\n    pdfUrl: carousel.pdfUrl,\n    thumbnailUrl: carousel.thumbnailUrl,\n    pageCount: carousel.pageCount,\n    sizeKB: carousel.sizeKB,\n    captionPreview: caption.substring(0, 200)\n  }\n}];"
+        "jsCode": "var LINKEDIN_CHANNEL = '69bbb1fe7be9f8b1717042b1';\nvar QUERY = 'mutation CreatePost($input: CreatePostInput!) { createPost(input: $input) { __typename ... on PostActionSuccess { post { id status dueAt } } ... on RestProxyError { message } } }';\n\n// Önceki node'dan: Parse Groq JSON \\u2192 caption / Generate Carousel PDF \\u2192 url'ler / Evaluate Slot \\u2192 targetSlot\nvar rawCaption = ($('Parse Groq JSON').first().json.linkedinCaption || '').trim();
+
+// Normalize format: ensure exactly one blank line before and after CTA, no blank line between Powered by and hashtags
+var lines = rawCaption.split('\n').map(function(l) { return l.trimEnd(); });
+var ctaIdx = -1, poweredIdx = -1, hashtagIdx = -1;
+for (var i = 0; i < lines.length; i++) {
+  if (lines[i].match(/^(Swipe through|Open the carousel)/i)) ctaIdx = i;
+  if (lines[i].match(/^Powered by/i)) poweredIdx = i;
+  if (lines[i].match(/^#Shopify/i)) hashtagIdx = i;
+}
+var caption;
+if (ctaIdx !== -1 && poweredIdx !== -1 && hashtagIdx !== -1) {
+  var body = lines.slice(0, ctaIdx).join('\n').replace(/\n{2,}$/, '').trimEnd();
+  var cta = lines[ctaIdx].trim();
+  caption = body + '\n\n' + cta + '\n\nPowered by Checkpoint: Store Scanner\n#Shopify #ShopifyDev #ShopifyChangelog #Ecommerce';
+} else {
+  caption = rawCaption;
+}\nvar carousel = $input.first().json || {};\nif (!carousel.pdfUrl || !carousel.thumbnailUrl) {\n  throw new Error('carousel-server response missing pdfUrl/thumbnailUrl');\n}\n\nvar slotCheck = $('Evaluate Slot').first().json.slotCheck;\nif (!slotCheck || !slotCheck.targetSlot) {\n  throw new Error('Slot check data missing \\u2014 did Evaluate Slot node run?');\n}\nvar dueAt = slotCheck.targetSlot;\n\n// Buffer CreatePostInput \\u2192 assets.documents = [{ url, title, thumbnailUrl }]\nvar bodyObj = {\n  query: QUERY,\n  variables: {\n    input: {\n      channelId: LINKEDIN_CHANNEL,\n      text: caption,\n      schedulingType: 'automatic',\n      mode: 'customScheduled',\n      dueAt: dueAt,\n      assets: {\n        document: {\n          url: carousel.pdfUrl,\n          title: carousel.title || 'Shopify Weekly Changelog',\n          thumbnailUrl: carousel.thumbnailUrl\n        }\n      }\n    }\n  }\n};\n\nvar bodyJson = JSON.stringify(bodyObj);\n\n// ASCII-safe JSON (emoji surrogate pair'leri HTTP layer'da bozulmas\\u0131n)\nvar safeBody = '';\nfor (var i = 0; i < bodyJson.length; i++) {\n  var code = bodyJson.charCodeAt(i);\n  if (code > 127) {\n    safeBody += '\\x5cu' + ('0000' + code.toString(16)).slice(-4);\n  } else {\n    safeBody += bodyJson[i];\n  }\n}\n\nreturn [{\n  json: {\n    body: safeBody,\n    dueAt: dueAt,\n    pdfUrl: carousel.pdfUrl,\n    thumbnailUrl: carousel.thumbnailUrl,\n    pageCount: carousel.pageCount,\n    sizeKB: carousel.sizeKB,\n    captionPreview: caption.substring(0, 200)\n  }\n}];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
