@@ -88,7 +88,7 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Bearer Dkf_5jv_LqpHFZxox2xIWA-JKp2CVmwnH0x1ZqCVGJe"
+              "value": "={{ 'Bearer ' + $env.BUFFER_ACCESS_TOKEN }}"
             },
             {
               "name": "Content-Type",
@@ -156,7 +156,7 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Bearer YOUR_GROQ_API_KEY"
+              "value": "={{ 'Bearer ' + $env.GROQ_API_KEY }}"
             },
             {
               "name": "Content-Type",
@@ -189,7 +189,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "http://127.0.0.1:3457/generate-carousel",
+        "url": "http://carousel-server:3457/generate-carousel",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -232,7 +232,7 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Bearer Dkf_5jv_LqpHFZxox2xIWA-JKp2CVmwnH0x1ZqCVGJe"
+              "value": "={{ 'Bearer ' + $env.BUFFER_ACCESS_TOKEN }}"
             },
             {
               "name": "Content-Type",
