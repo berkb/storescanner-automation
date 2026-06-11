@@ -1,0 +1,109 @@
+{
+  "name": "Weekly Tip Videos",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [1],
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [0, 0],
+      "id": "b2000001-0000-0000-0000-000000000001",
+      "name": "Her Pazartesi 08:00"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:3456/daily",
+        "options": { "timeout": 7200000 }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [220, 0],
+      "id": "b2000002-0000-0000-0000-000000000002",
+      "name": "7 Tip Video Render Et"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nif (item.exitCode !== 0) {\n  throw new Error('daily-generate.mjs failed. Exit code: ' + item.exitCode);\n}\nconst stdout = (item.stdout || '').trim();\nconst jsonLine = stdout.split('\\n').find(l => l.startsWith('{'));\nconst result = JSON.parse(jsonLine);\nreturn [{ json: result }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 0],
+      "id": "b2000003-0000-0000-0000-000000000003",
+      "name": "Render Kontrol"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:3456/publish-daily",
+        "options": { "timeout": 600000 }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [660, 0],
+      "id": "b2000004-0000-0000-0000-000000000004",
+      "name": "Buffer'a Schedule Et"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst stdout = (item.stdout || '').trim();\nconst jsonLine = stdout.split('\\n').find(l => l.startsWith('{'));\nlet result;\ntry { result = JSON.parse(jsonLine); } catch(e) { result = { raw: stdout }; }\nconst failed = (result.summary || []).filter(s => s.error || s.hasError).length;\nconst success = item.exitCode === 0 && failed === 0;\nreturn [{ json: { ...result, exitCode: item.exitCode, failed, success } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [880, 0],
+      "id": "b2000005-0000-0000-0000-000000000005",
+      "name": "Publish Kontrol"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": false, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "id": "success-check",
+              "leftValue": "={{ $json.success }}",
+              "rightValue": true,
+              "operator": { "type": "boolean", "operation": "equals" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1100, 0],
+      "id": "b2000006-0000-0000-0000-000000000006",
+      "name": "Başarılı mı?"
+    }
+  ],
+  "connections": {
+    "Her Pazartesi 08:00": {
+      "main": [[{ "node": "7 Tip Video Render Et", "type": "main", "index": 0 }]]
+    },
+    "7 Tip Video Render Et": {
+      "main": [[{ "node": "Render Kontrol", "type": "main", "index": 0 }]]
+    },
+    "Render Kontrol": {
+      "main": [[{ "node": "Buffer'a Schedule Et", "type": "main", "index": 0 }]]
+    },
+    "Buffer'a Schedule Et": {
+      "main": [[{ "node": "Publish Kontrol", "type": "main", "index": 0 }]]
+    },
+    "Publish Kontrol": {
+      "main": [[{ "node": "Başarılı mı?", "type": "main", "index": 0 }]]
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}
