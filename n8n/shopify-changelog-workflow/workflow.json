@@ -7,7 +7,9 @@
           "interval": [
             {
               "field": "weeks",
-              "triggerAtDay": [1],
+              "triggerAtDay": [
+                1
+              ],
               "triggerAtHour": 9,
               "triggerAtMinute": 30
             }
@@ -16,7 +18,10 @@
       },
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.3,
-      "position": [0, 0],
+      "position": [
+        0,
+        0
+      ],
       "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "name": "Her Pazartesi 09:30"
     },
@@ -26,7 +31,10 @@
       },
       "type": "n8n-nodes-base.rssFeedRead",
       "typeVersion": 1,
-      "position": [220, 0],
+      "position": [
+        220,
+        0
+      ],
       "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
       "name": "RSS Feed Read"
     },
@@ -36,7 +44,10 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [440, 0],
+      "position": [
+        440,
+        0
+      ],
       "id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
       "name": "Prompt Generator"
     },
@@ -65,7 +76,10 @@
       },
       "type": "n8n-nodes-base.filter",
       "typeVersion": 2,
-      "position": [660, 0],
+      "position": [
+        660,
+        0
+      ],
       "id": "g7h8i9j0-k1l2-3456-mnop-qrstuvwx1234",
       "name": "Has New Items"
     },
@@ -75,7 +89,10 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [880, 0],
+      "position": [
+        880,
+        0
+      ],
       "id": "j0k1l2m3-n4o5-6789-pqrs-tuvwx1234567",
       "name": "Compute Slot Window"
     },
@@ -104,7 +121,10 @@
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
-      "position": [1100, 0],
+      "position": [
+        1100,
+        0
+      ],
       "id": "l2m3n4o5-p6q7-8901-rstu-vwxy23456789",
       "name": "Check Buffer Slot"
     },
@@ -114,7 +134,10 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1320, 0],
+      "position": [
+        1320,
+        0
+      ],
       "id": "m3n4o5p6-q7r8-9012-stuv-wxyz34567890",
       "name": "Evaluate Slot"
     },
@@ -143,7 +166,10 @@
       },
       "type": "n8n-nodes-base.filter",
       "typeVersion": 2,
-      "position": [1540, 0],
+      "position": [
+        1540,
+        0
+      ],
       "id": "k1l2m3n4-o5p6-7890-qrst-uvwx12345678",
       "name": "Slot Available"
     },
@@ -172,7 +198,10 @@
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
-      "position": [1760, 0],
+      "position": [
+        1760,
+        0
+      ],
       "id": "d4e5f6a7-b8c9-0123-def0-234567890123",
       "name": "Groq API"
     },
@@ -182,7 +211,10 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1980, 0],
+      "position": [
+        1980,
+        0
+      ],
       "id": "h8i9j0k1-l2m3-4567-nopq-rstuvwx12345",
       "name": "Parse Groq JSON"
     },
@@ -209,17 +241,23 @@
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
-      "position": [2200, 0],
+      "position": [
+        2200,
+        0
+      ],
       "id": "i9j0k1l2-m3n4-5678-opqr-stuvwx123456",
       "name": "Generate Carousel PDF"
     },
     {
       "parameters": {
-        "jsCode": "var LINKEDIN_CHANNEL = '69bbb1fe7be9f8b1717042b1';\nvar QUERY = 'mutation CreatePost($input: CreatePostInput!) { createPost(input: $input) { __typename ... on PostActionSuccess { post { id status dueAt } } ... on RestProxyError { message } } }';\n\n// Önceki node'dan: Parse Groq JSON \\u2192 caption / Generate Carousel PDF \\u2192 url'ler / Evaluate Slot \\u2192 targetSlot\nvar rawCaption = ($('Parse Groq JSON').first().json.linkedinCaption || '').trim();\n\n// Normalize format: ensure exactly one blank line before and after CTA, no blank line between Powered by and hashtags\nvar lines = rawCaption.split('\n').map(function(l) { return l.trimEnd(); });\nvar ctaIdx = -1, poweredIdx = -1, hashtagIdx = -1;\nfor (var i = 0; i < lines.length; i++) {\n  if (lines[i].match(/^(Swipe through|Open the carousel)/i)) ctaIdx = i;\n  if (lines[i].match(/^Powered by/i)) poweredIdx = i;\n  if (lines[i].match(/^#Shopify/i)) hashtagIdx = i;\n}\nvar caption;\nif (ctaIdx !== -1 && poweredIdx !== -1 && hashtagIdx !== -1) {\n  var bodyLines = lines.slice(0, ctaIdx).filter(function(l) { return l.trim() !== ''; });\nvar body = bodyLines.join('\n').trimEnd();\n  var cta = lines[ctaIdx].trim();\n  caption = body + '\n\n' + cta + '\n\nPowered by Checkpoint: Store Scanner\n#Shopify #ShopifyDev #ShopifyChangelog #Ecommerce';\n} else {\n  caption = rawCaption;\n}\nvar carousel = $input.first().json || {};\nif (!carousel.pdfUrl || !carousel.thumbnailUrl) {\n  throw new Error('carousel-server response missing pdfUrl/thumbnailUrl');\n}\n\nvar slotCheck = $('Evaluate Slot').first().json.slotCheck;\nif (!slotCheck || !slotCheck.targetSlot) {\n  throw new Error('Slot check data missing \\u2014 did Evaluate Slot node run?');\n}\nvar dueAt = slotCheck.targetSlot;\n\n// Buffer CreatePostInput \\u2192 assets.documents = [{ url, title, thumbnailUrl }]\nvar bodyObj = {\n  query: QUERY,\n  variables: {\n    input: {\n      channelId: LINKEDIN_CHANNEL,\n      text: caption,\n      schedulingType: 'automatic',\n      mode: 'customScheduled',\n      dueAt: dueAt,\n      assets: {\n        document: {\n          url: carousel.pdfUrl,\n          title: carousel.title || 'Shopify Weekly Changelog',\n          thumbnailUrl: carousel.thumbnailUrl\n        }\n      }\n    }\n  }\n};\n\nvar bodyJson = JSON.stringify(bodyObj);\n\n// ASCII-safe JSON (emoji surrogate pair'leri HTTP layer'da bozulmas\\u0131n)\nvar safeBody = '';\nfor (var i = 0; i < bodyJson.length; i++) {\n  var code = bodyJson.charCodeAt(i);\n  if (code > 127) {\n    safeBody += '\\x5cu' + ('0000' + code.toString(16)).slice(-4);\n  } else {\n    safeBody += bodyJson[i];\n  }\n}\n\nreturn [{\n  json: {\n    body: safeBody,\n    dueAt: dueAt,\n    pdfUrl: carousel.pdfUrl,\n    thumbnailUrl: carousel.thumbnailUrl,\n    pageCount: carousel.pageCount,\n    sizeKB: carousel.sizeKB,\n    captionPreview: caption.substring(0, 200)\n  }\n}];"
+        "jsCode": "var LINKEDIN_CHANNEL = '69bbb1fe7be9f8b1717042b1';\nvar QUERY = 'mutation CreatePost($input: CreatePostInput!) { createPost(input: $input) { __typename ... on PostActionSuccess { post { id status dueAt } } ... on RestProxyError { message } } }';\n\n// Önceki node'dan: Parse Groq JSON \\u2192 caption / Generate Carousel PDF \\u2192 url'ler / Evaluate Slot \\u2192 targetSlot\nvar rawCaption = ($('Parse Groq JSON').first().json.linkedinCaption || '').trim();\n\n// Normalize format: ensure exactly one blank line before and after CTA, no blank line between Powered by and hashtags\nvar lines = rawCaption.split('\\n').map(function(l) { return l.trimEnd(); });\nvar ctaIdx = -1, poweredIdx = -1, hashtagIdx = -1;\nfor (var i = 0; i < lines.length; i++) {\n  if (lines[i].match(/^(Swipe through|Open the carousel)/i)) ctaIdx = i;\n  if (lines[i].match(/^Powered by/i)) poweredIdx = i;\n  if (lines[i].match(/^#Shopify/i)) hashtagIdx = i;\n}\nvar caption;\nif (ctaIdx !== -1 && poweredIdx !== -1 && hashtagIdx !== -1) {\n  var bodyLines = lines.slice(0, ctaIdx).filter(function(l) { return l.trim() !== ''; });\nvar body = bodyLines.join('\n').trimEnd();\n  var cta = lines[ctaIdx].trim();\n  caption = body + '\n\n' + cta + '\n\nPowered by Checkpoint: Store Scanner\n#Shopify #ShopifyDev #ShopifyChangelog #Ecommerce';\n} else {\n  caption = rawCaption;\n}\nvar carousel = $input.first().json || {};\nif (!carousel.pdfUrl || !carousel.thumbnailUrl) {\n  throw new Error('carousel-server response missing pdfUrl/thumbnailUrl');\n}\n\nvar slotCheck = $('Evaluate Slot').first().json.slotCheck;\nif (!slotCheck || !slotCheck.targetSlot) {\n  throw new Error('Slot check data missing \\u2014 did Evaluate Slot node run?');\n}\nvar dueAt = slotCheck.targetSlot;\n\n// Buffer CreatePostInput \\u2192 assets.documents = [{ url, title, thumbnailUrl }]\nvar bodyObj = {\n  query: QUERY,\n  variables: {\n    input: {\n      channelId: LINKEDIN_CHANNEL,\n      text: caption,\n      schedulingType: 'automatic',\n      mode: 'customScheduled',\n      dueAt: dueAt,\n      assets: {\n        document: {\n          url: carousel.pdfUrl,\n          title: carousel.title || 'Shopify Weekly Changelog',\n          thumbnailUrl: carousel.thumbnailUrl\n        }\n      }\n    }\n  }\n};\n\nvar bodyJson = JSON.stringify(bodyObj);\n\n// ASCII-safe JSON (emoji surrogate pair'leri HTTP layer'da bozulmas\\u0131n)\nvar safeBody = '';\nfor (var i = 0; i < bodyJson.length; i++) {\n  var code = bodyJson.charCodeAt(i);\n  if (code > 127) {\n    safeBody += '\\x5cu' + ('0000' + code.toString(16)).slice(-4);\n  } else {\n    safeBody += bodyJson[i];\n  }\n}\n\nreturn [{\n  json: {\n    body: safeBody,\n    dueAt: dueAt,\n    pdfUrl: carousel.pdfUrl,\n    thumbnailUrl: carousel.thumbnailUrl,\n    pageCount: carousel.pageCount,\n    sizeKB: carousel.sizeKB,\n    captionPreview: caption.substring(0, 200)\n  }\n}];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [2420, 0],
+      "position": [
+        2420,
+        0
+      ],
       "id": "e5f6a7b8-c9d0-1234-ef01-345678901234",
       "name": "Build Buffer Body"
     },
@@ -248,7 +286,10 @@
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
-      "position": [2640, 0],
+      "position": [
+        2640,
+        0
+      ],
       "id": "f6a7b8c9-d0e1-2345-f012-456789012345",
       "name": "Buffer API (LinkedIn)"
     },
@@ -260,47 +301,146 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
-      "position": [0, 260],
+      "position": [
+        0,
+        260
+      ],
       "id": "note-info",
       "name": "Açıklama"
     }
   ],
   "connections": {
     "Her Pazartesi 09:30": {
-      "main": [[{ "node": "RSS Feed Read", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "RSS Feed Read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "RSS Feed Read": {
-      "main": [[{ "node": "Prompt Generator", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Prompt Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Prompt Generator": {
-      "main": [[{ "node": "Has New Items", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Has New Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Has New Items": {
-      "main": [[{ "node": "Compute Slot Window", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Compute Slot Window",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Compute Slot Window": {
-      "main": [[{ "node": "Check Buffer Slot", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Check Buffer Slot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Check Buffer Slot": {
-      "main": [[{ "node": "Evaluate Slot", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Evaluate Slot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Evaluate Slot": {
-      "main": [[{ "node": "Slot Available", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Slot Available",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Slot Available": {
-      "main": [[{ "node": "Groq API", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Groq API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Groq API": {
-      "main": [[{ "node": "Parse Groq JSON", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Parse Groq JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Parse Groq JSON": {
-      "main": [[{ "node": "Generate Carousel PDF", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Generate Carousel PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Generate Carousel PDF": {
-      "main": [[{ "node": "Build Buffer Body", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Build Buffer Body",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Build Buffer Body": {
-      "main": [[{ "node": "Buffer API (LinkedIn)", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Buffer API (LinkedIn)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "meta": {
