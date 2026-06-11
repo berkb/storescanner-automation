@@ -227,13 +227,8 @@ for (var i = 0; i < lines.length; i++) {
 }
 var caption;
 if (ctaIdx !== -1 && poweredIdx !== -1 && hashtagIdx !== -1) {
-  var bodyLines = lines.slice(0, ctaIdx);
-// Remove blank line between hook (first line) and description
-var firstNonEmpty = 0;
-while (firstNonEmpty < bodyLines.length && bodyLines[firstNonEmpty].trim() === '') firstNonEmpty++;
-var hook = bodyLines[firstNonEmpty] || '';
-var rest = bodyLines.slice(firstNonEmpty + 1).join('\n').replace(/^\n+/, '');
-var body = (hook + '\n' + rest).replace(/\n{2,}$/, '').trimEnd();
+  var bodyLines = lines.slice(0, ctaIdx).filter(function(l) { return l.trim() !== ''; });
+var body = bodyLines.join('\n').trimEnd();
   var cta = lines[ctaIdx].trim();
   caption = body + '\n\n' + cta + '\n\nPowered by Checkpoint: Store Scanner\n#Shopify #ShopifyDev #ShopifyChangelog #Ecommerce';
 } else {
