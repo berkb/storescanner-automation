@@ -41,7 +41,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const item = $input.first().json;\nif (item.exitCode !== 0) {\n  throw new Error('weekly-generate.mjs hata ile çıktı. Log: /tmp/weekly-render.log');\n}\nconst stdout = (item.stdout || '').trim();\nconst jsonLine = stdout.split('\\n').find(l => l.startsWith('{'));\nconst result = JSON.parse(jsonLine);\nreturn [{ json: result }];"
+        "jsCode": "const item = $input.first().json;\nif (item.exitCode !== 0) {\n  const errTail = (item.stderr || '').split('\\n').filter(Boolean).slice(-10).join('\\n');\n  throw new Error('weekly-generate.mjs failed:\\n' + errTail);\n}\nconst stdout = (item.stdout || '').trim();\nconst jsonLine = stdout.split('\\n').find(l => l.startsWith('{'));\nconst result = JSON.parse(jsonLine);\nif (result.count === 0) {\n  const errTail = (item.stderr || '').split('\\n').filter(Boolean).slice(-10).join('\\n');\n  throw new Error('Render 0 video üretti:\\n' + errTail);\n}\nreturn [{ json: result }];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,

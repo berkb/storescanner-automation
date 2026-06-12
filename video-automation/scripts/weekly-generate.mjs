@@ -176,4 +176,10 @@ try {
 } catch (e) {}
 
 process.stderr.write(`\n✅ Tamamlandı: ${entries.length} video — ${weekLabel}\n`);
+
+if (entries.length === 0 && selected.length > 0) {
+  process.stderr.write('❌ Hiç video üretilemedi. GROQ_API_KEY ayarlı mı?\n');
+  process.exit(1);
+}
+
 process.stdout.write(JSON.stringify({ manifestPath, weekOf: weekLabel, count: entries.length }) + '\n');

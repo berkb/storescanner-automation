@@ -41,7 +41,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const item = $input.first().json;\nif (item.exitCode !== 0) {\n  throw new Error('daily-generate.mjs failed. Exit code: ' + item.exitCode);\n}\nconst stdout = (item.stdout || '').trim();\nconst jsonLine = stdout.split('\\n').find(l => l.startsWith('{'));\nconst result = JSON.parse(jsonLine);\nreturn [{ json: result }];"
+        "jsCode": "const item = $input.first().json;\nif (item.exitCode !== 0) {\n  const errTail = (item.stderr || '').split('\\n').filter(Boolean).slice(-10).join('\\n');\n  throw new Error('daily-generate.mjs failed:\\n' + errTail);\n}\nconst stdout = (item.stdout || '').trim();\nconst jsonLine = stdout.split('\\n').find(l => l.startsWith('{'));\nconst result = JSON.parse(jsonLine);\nreturn [{ json: result }];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,

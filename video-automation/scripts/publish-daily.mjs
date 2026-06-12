@@ -86,4 +86,4 @@ const failed  = summary.filter(s => s.error || s.hasError).length;
 const skipped = summary.filter(s => s.skipped).length;
 process.stderr.write(`\n✅ Başarılı: ${ok}  ❌ Hatalı: ${failed}  ⏭ Atlanan: ${skipped}\n`);
 
-process.stdout.write(JSON.stringify({ weekOf: manifest.weekOf, summary }, null, 2) + '\n');
+process.stdout.write(JSON.stringify({ weekOf: manifest.weekOf, summary }) + '\n');
