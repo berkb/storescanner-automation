@@ -120,7 +120,7 @@ for (let i = 0; i < selected.length; i++) {
     music,
     captions: {
       instagram: { caption },
-      tiktok:    { caption: caption.slice(0, 150) },
+      tiktok:    { caption },
       youtube:   {
         title:       `Shopify Tip #${String(tip.id).padStart(3, '0')}: ${tip.hook}`,
         description: `${tip.body}\n\n${caption}`,
