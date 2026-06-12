@@ -67,7 +67,7 @@ async function createPost({ channelId, text, videoUrl, publishAt, metadata }) {
     input: {
       channelId,
       text:           text.slice(0, 2200),
-      assets:         { videos: [{ url: videoUrl }] },
+      assets:         { video: { url: videoUrl } },
       schedulingType: 'automatic',
       mode:           'customScheduled',
       dueAt:          publishAt,
