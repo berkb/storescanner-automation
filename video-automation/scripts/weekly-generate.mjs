@@ -35,7 +35,7 @@ if (allIds.every(id => state.used.includes(id))) {
   state.used = []; // Tümü kullanıldıysa sıfırla
 }
 const available = TOPICS.filter(t => !state.used.includes(t.id));
-const selected  = available.sort(() => Math.random() - 0.5).slice(0, 7);
+const selected  = available.sort(() => Math.random() - 0.5).slice(0, 1);
 
 // ─── Available media files ────────────────────────────────────────────────────
 const MUSIC_DIR = path.join(ROOT, 'public', 'musics');
@@ -48,20 +48,15 @@ const defaultChime = chimeFile ? `sfx/${chimeFile}` : 'sfx/universfield-clear-be
 
 const pickRandom = arr => arr[Math.floor(Math.random() * arr.length)];
 
-// ─── Publish tarihleri (yarından itibaren 7 gün, 14:00 UTC) ──────────────────
+// ─── Publish tarihi: bugün 16:00 UTC ─────────────────────────────────────────
 function getPublishDates() {
-  const start = new Date();
-  start.setDate(start.getDate() + 1);
-  start.setUTCHours(14, 0, 0, 0);
-  return Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(start);
-    d.setDate(start.getDate() + i);
-    return d.toISOString();
-  });
+  const today = new Date();
+  today.setUTCHours(16, 0, 0, 0);
+  return [today.toISOString()];
 }
 
 const publishDates = getPublishDates();
-const weekLabel    = publishDates[0].slice(0, 10);
+const weekLabel    = new Date().toISOString().slice(0, 10);
 const OUT_DIR      = path.join(ROOT, 'out', weekLabel);
 fs.mkdirSync(OUT_DIR, { recursive: true });
 

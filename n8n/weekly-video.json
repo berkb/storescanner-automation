@@ -6,19 +6,21 @@
         "rule": {
           "interval": [
             {
-              "field": "weeks",
-              "triggerAtDay": [1],
+              "field": "days",
               "triggerAtHour": 10,
-              "triggerAtMinute": 30
+              "triggerAtMinute": 0
             }
           ]
         }
       },
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.3,
-      "position": [0, 300],
+      "position": [
+        0,
+        300
+      ],
       "id": "ww-0001",
-      "name": "Her Pazartesi 10:30"
+      "name": "Her Gün 10:00"
     },
     {
       "parameters": {
@@ -26,7 +28,10 @@
       },
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
-      "position": [240, 300],
+      "position": [
+        240,
+        300
+      ],
       "id": "ww-0002",
       "name": "7 Video Render Et"
     },
@@ -36,7 +41,10 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [480, 300],
+      "position": [
+        480,
+        300
+      ],
       "id": "ww-0003",
       "name": "Render Sonucu Kontrol"
     },
@@ -46,7 +54,10 @@
       },
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
-      "position": [720, 300],
+      "position": [
+        720,
+        300
+      ],
       "id": "ww-0004",
       "name": "Buffer'a Schedule Et"
     },
@@ -56,20 +67,30 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [960, 300],
+      "position": [
+        960,
+        300
+      ],
       "id": "ww-0005",
       "name": "Publish Sonucu Kontrol"
     },
     {
       "parameters": {
         "conditions": {
-          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
           "conditions": [
             {
               "id": "success-check",
               "leftValue": "={{ $json.success }}",
               "rightValue": true,
-              "operator": { "type": "boolean", "operation": "equals" }
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
             }
           ],
           "combinator": "and"
@@ -77,7 +98,10 @@
       },
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
-      "position": [1200, 300],
+      "position": [
+        1200,
+        300
+      ],
       "id": "ww-0006",
       "name": "Başarılı mı?"
     },
@@ -89,7 +113,10 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
-      "position": [1440, 100],
+      "position": [
+        1440,
+        100
+      ],
       "id": "ww-0007",
       "name": "Başarı Notu"
     },
@@ -101,7 +128,10 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
-      "position": [1440, 460],
+      "position": [
+        1440,
+        460
+      ],
       "id": "ww-0008",
       "name": "Hata Notu"
     },
@@ -113,26 +143,69 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
-      "position": [0, 0],
+      "position": [
+        0,
+        0
+      ],
       "id": "ww-0009",
       "name": "Kurulum Rehberi"
     }
   ],
   "connections": {
     "Her Pazartesi 10:30": {
-      "main": [[{ "node": "7 Video Render Et", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "7 Video Render Et",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "7 Video Render Et": {
-      "main": [[{ "node": "Render Sonucu Kontrol", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Render Sonucu Kontrol",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Render Sonucu Kontrol": {
-      "main": [[{ "node": "Buffer'a Schedule Et", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Buffer'a Schedule Et",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Buffer'a Schedule Et": {
-      "main": [[{ "node": "Publish Sonucu Kontrol", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Publish Sonucu Kontrol",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Publish Sonucu Kontrol": {
-      "main": [[{ "node": "Başarılı mı?", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Başarılı mı?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {

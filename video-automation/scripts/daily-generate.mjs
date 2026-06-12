@@ -34,29 +34,22 @@ if (allIds.every(id => state.used.includes(id))) {
   state.used = [];
 }
 const available = TIPS.filter(t => !state.used.includes(t.id));
-const selected  = available.slice(0, 7);
+const selected  = available.slice(0, 1);
 
 if (selected.length === 0) {
   process.stderr.write('❌ Kullanılabilir tip bulunamadı.\n');
   process.exit(1);
 }
 
-// ─── Publish tarihleri (bu haftanın Pzt-Paz, 11:00 UTC) ──────────────────────
+// ─── Publish tarihi: bugün 11:00 UTC ─────────────────────────────────────────
 function getPublishDates() {
-  const now     = new Date();
-  const day     = now.getDay();
-  const monday  = new Date(now);
-  monday.setDate(now.getDate() - (day === 0 ? 6 : day - 1));
-  monday.setUTCHours(11, 0, 0, 0);
-  return Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(monday);
-    d.setDate(monday.getDate() + i);
-    return d.toISOString();
-  });
+  const today = new Date();
+  today.setUTCHours(11, 0, 0, 0);
+  return [today.toISOString()];
 }
 
 const publishDates = getPublishDates();
-const weekLabel    = publishDates[0].slice(0, 10);
+const weekLabel    = new Date().toISOString().slice(0, 10);
 const OUT_DIR      = path.join(ROOT, 'out', weekLabel);
 fs.mkdirSync(OUT_DIR, { recursive: true });
 
