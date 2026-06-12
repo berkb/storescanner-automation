@@ -1,0 +1,111 @@
+{
+  "name": "Checkpoint Mention Monitor",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [0, 300],
+      "id": "mm-0001",
+      "name": "Her 15 Dakikada Bir"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ─── Kaynakları tara: Reddit + Hacker News ───────────────────────────────\n// Auth gerekmez. Reddit User-Agent header'ı zorunlu.\n\nconst UA = 'checkpoint-monitor/1.0 (by /u/checkpoint-store-scanner)';\nconst WINDOW_DAYS = 60;\nconst WINDOW_SECONDS = WINDOW_DAYS * 24 * 60 * 60;\nconst windowStartUnix = Math.floor(Date.now() / 1000) - WINDOW_SECONDS;\n\n// Reddit için tek OR'lı full-text sorgu (restrict_sr=0 → tüm reddit)\nconst REDDIT_QUERY = [\n  '\"ghost theme\"',\n  '\"ghost app\"',\n  '\"hidden shopify\"',\n  '\"orphan app\"',\n  '\"orphaned app\"',\n  '\"zombie app\"',\n  '\"shopify app scanner\"',\n  '\"shopify app detector\"',\n  '\"checkpoint store scanner\"',\n  '\"storehealth\"',\n  '\"store health shopify\"',\n  '\"unused shopify apps\"',\n  '\"shopify app cleanup\"',\n  '\"leftover shopify\"',\n].join(' OR ');\n\n// HN Algolia tek istekte OR desteklemiyor; anahtar kelimeleri tek tek sorgula.\nconst HN_QUERIES = [\n  'ghost theme shopify',\n  'ghost app shopify',\n  'hidden shopify apps',\n  'shopify app scanner',\n  'shopify app detector',\n  'orphan shopify app',\n  'zombie shopify app',\n  'storehealth',\n  'store health shopify',\n  'checkpoint store scanner',\n  'unused shopify apps',\n];\n\nconst results = [];\n\n// ── Reddit ────────────────────────────────────────────────────────────────\ntry {\n  const url = `https://www.reddit.com/search.json?q=${encodeURIComponent(REDDIT_QUERY)}&sort=new&limit=100&t=year&restrict_sr=0`;\n  const res = await fetch(url, { headers: { 'User-Agent': UA, 'Accept': 'application/json' } });\n  if (res.ok) {\n    const json = await res.json();\n    for (const child of (json?.data?.children || [])) {\n      const p = child.data || {};\n      if (!p.id || !p.title) continue;\n      if ((p.created_utc || 0) < windowStartUnix) continue; // son 60 gün\n      results.push({\n        id: `reddit:${p.id}`,\n        source: `r/${p.subreddit}`,\n        sourceType: 'reddit',\n        title: p.title,\n        url: `https://reddit.com${p.permalink}`,\n        text: String(p.selftext || '').slice(0, 600),\n        author: p.author || 'unknown',\n        createdAt: new Date(p.created_utc * 1000).toISOString(),\n        score: p.score ?? 0,\n      });\n    }\n  } else {\n    console.log(`[reddit] HTTP ${res.status}`);\n  }\n} catch (e) {\n  console.log('[reddit] error:', e.message);\n}\n\n// ── Hacker News (Algolia) ─────────────────────────────────────────────────\nfor (const q of HN_QUERIES) {\n  try {\n    const url = `https://hn.algolia.com/api/v1/search_by_date?query=${encodeURIComponent(q)}&tags=(story,comment)&numericFilters=created_at_i>${windowStartUnix}&hitsPerPage=50`;\n    const res = await fetch(url);\n    if (!res.ok) continue;\n    const json = await res.json();\n    for (const hit of (json.hits || [])) {\n      const isComment = !!hit.comment_text;\n      const title = hit.title || hit.story_title || (isComment ? `[Comment] ${(hit.comment_text || '').slice(0, 80)}` : '');\n      if (!title) continue;\n      results.push({\n        id: `hn:${hit.objectID}`,\n        source: isComment ? 'HN (comment)' : 'HN (story)',\n        sourceType: 'hn',\n        title,\n        url: hit.url || `https://news.ycombinator.com/item?id=${hit.objectID}`,\n        text: String(hit.story_text || hit.comment_text || '').slice(0, 600),\n        author: hit.author || 'unknown',\n        createdAt: hit.created_at,\n        score: hit.points ?? 0,\n      });\n    }\n  } catch (e) {\n    console.log(`[hn:${q}] error:`, e.message);\n  }\n}\n\n// Dedup by id\nconst uniq = Array.from(new Map(results.map(r => [r.id, r])).values());\n\n// Her zaman tek bir item dön (boş olsa bile) ki pipeline aşağı aksın.\nreturn [{ json: { posts: uniq, fetchedAt: new Date().toISOString() } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "id": "mm-0002",
+      "name": "Kaynakları Tara"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ─── Filtrele + dedupe (static data) ─────────────────────────────────────\n// - Keyword regex'leriyle strict match (false positive minimize)\n// - Daha önce görülenleri workflowStaticData'dan at\n// - İlk run: tek DIGEST mail (ilk 50 match)\n// - Sonraki run'lar: her yeni konu için ayrı mail + son 2 ayın ilgili 50 context'i\n// - Yeni id'leri 'seen'e YAZARAK mail gönderiminden ÖNCE commit et\n//   (mail patlasa bile duplicate mail atmamak öncelik).\n\n// Her durumda yeterince spesifik patternler (tek başlarına eşleşebilir)\nconst STRICT_PATTERNS = [\n  /\\bhidden\\s+shopify\\s+apps?\\b/i,\n  /\\borphan(ed)?\\s+shopify\\s+apps?\\b/i,\n  /\\bshopify\\s+app\\s+scanner\\b/i,\n  /\\bshopify\\s+app\\s+detector\\b/i,\n  /\\bshopify\\s+app\\s+cleanup\\b/i,\n  /\\bunused\\s+shopify\\s+apps?\\b/i,\n  /\\bleftover\\s+shopify\\b/i,\n  /\\btheme\\s+app\\s+embeds?\\b/i,\n  /\\bstorehealth(\\.app)?\\b/i,\n  /\\bstore\\s+health\\s+shopify\\b/i,\n  /\\bcheckpoint\\s+store\\s+scanner\\b/i,\n  /\\bremove\\s+(unused|old|stale)\\s+shopify\\s+apps?\\b/i,\n  /\\buninstall(ed)?\\s+shopify\\s+app(s)?\\s+(left|remain|residue)/i,\n];\n\n// Sadece metinde ayrıca 'shopify' kelimesi de varsa geçerli\n// (Ghost CMS, Ghost müzik grubu, Snap ghost app gibi false positive'leri eler)\nconst CONTEXT_PATTERNS = [\n  /\\bghost\\s+theme(s)?\\b/i,\n  /\\bghost\\s+apps?\\b/i,\n  /\\bzombie\\s+apps?\\b/i,\n  /\\borphan(ed)?\\s+apps?\\b/i,\n];\n\n// Subreddit blacklist — Ghost CMS/band/Snap gibi isimler buralarda\nconst SUBREDDIT_BLACKLIST = [\n  /^r\\/Ghost$/i,\n  /^r\\/GhostBSD/i,\n  /^r\\/GhostBand/i,\n  /^r\\/ghostbc/i,\n  /^r\\/ghoststories/i,\n  /^r\\/snapstreakss?$/i,\n  /^r\\/snapchat/i,\n  /^r\\/Prom$/i,\n  /^r\\/digitalminimalism/i,\n  /^r\\/runningman/i,\n  /^r\\/claude/i,\n  /^r\\/BuildWithClaude/i,\n  /^r\\/BlackberryAI/i,\n];\n\nconst hasShopify = /\\bshopify\\b/i;\n\nconst all = ($input.first()?.json?.posts) || [];\n\nconst matched = all.filter(p => {\n  if (p.source && SUBREDDIT_BLACKLIST.some(re => re.test(p.source))) return false;\n  const hay = `${p.title || ''}\\n${p.text || ''}`;\n  if (STRICT_PATTERNS.some(re => re.test(hay))) return true;\n  if (CONTEXT_PATTERNS.some(re => re.test(hay)) && hasShopify.test(hay)) return true;\n  return false;\n});\n\n// yeni -> eski\nmatched.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));\n\nconst staticData = $getWorkflowStaticData('global');\nconst isFirstRun = !staticData.bootstrapped;\nif (!Array.isArray(staticData.seenIds)) staticData.seenIds = [];\nconst seen = new Set(staticData.seenIds);\n\nconst newItems = matched.filter(p => !seen.has(p.id));\n\n// SEEN güncelle: her durumda tüm match id'lerini kaydet (ilk run dahil)\nconst updatedSeen = [...staticData.seenIds, ...matched.map(p => p.id)];\nstaticData.seenIds = Array.from(new Set(updatedSeen)).slice(-3000);\nstaticData.lastRunAt = new Date().toISOString();\n\n// ── İLK RUN: tek digest mail, max 50 başlık ──────────────────────────────\nif (isFirstRun) {\n  staticData.bootstrapped = true;\n  staticData.bootstrapAt = new Date().toISOString();\n  const digest = matched.slice(0, 50);\n  staticData.lastStats = { mode: 'digest', fetched: all.length, matched: matched.length, sent: digest.length };\n  if (digest.length === 0) return [];\n  return [{ json: { mode: 'digest', posts: digest } }];\n}\n\n// ── NORMAL RUN: yeni konu başına 1 mail ──────────────────────────────────\nconst MAX_PER_RUN = 15; // safety\nconst toSend = newItems.slice(0, MAX_PER_RUN);\nconst context = matched.slice(0, 50); // son 2 ayın ilgili 50 başlığı\n\nstaticData.lastStats = { mode: 'normal', fetched: all.length, matched: matched.length, new: newItems.length, sent: toSend.length };\n\nif (toSend.length === 0) return [];\n\nreturn toSend.map(item => ({\n  json: { mode: 'single', new: item, context },\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [480, 300],
+      "id": "mm-0003",
+      "name": "Filtrele ve Dedupe"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ─── Mail gövdesi (HTML) hazırla ─────────────────────────────────────────\n// İki mod: 'digest' (ilk run, tek mail 50 başlık) | 'single' (her yeni konu)\n\nconst esc = (s) => String(s || '').replace(/[&<>\"']/g, c => ({\n  '&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',\"'\":'&#39;'\n}[c]));\nconst shortDate = (iso) => (iso || '').slice(0, 10);\n\nconst buildRow = (c, i) => `\n  <tr>\n    <td style=\"padding:6px 10px;border-bottom:1px solid #eee;color:#888;font-variant-numeric:tabular-nums;vertical-align:top;\">${i + 1}</td>\n    <td style=\"padding:6px 10px;border-bottom:1px solid #eee;\">\n      <a href=\"${esc(c.url)}\" style=\"color:#1a73e8;text-decoration:none;\">${esc(c.title || '(başlıksız)')}</a>\n      <div style=\"color:#888;font-size:12px;margin-top:2px;\">${esc(c.source)} · ${esc(shortDate(c.createdAt))} · score ${c.score ?? '-'} · ${esc(c.author)}</div>\n    </td>\n  </tr>`;\n\nconst data = $input.first().json;\nconst now = new Date().toISOString();\n\n// ── DIGEST (ilk run) ─────────────────────────────────────────────────────\nif (data.mode === 'digest') {\n  const posts = data.posts || [];\n  const subject = `[Checkpoint Monitor] İlk tarama: ${posts.length} başlık bulundu`;\n  const rows = posts.map(buildRow).join('');\n  const html = `<!doctype html>\n<html><body style=\"font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:720px;margin:0 auto;padding:20px;color:#222;\">\n  <div style=\"background:#e0f2fe;border-left:4px solid #0284c7;padding:14px 18px;border-radius:4px;\">\n    <div style=\"font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:#0369a1;margin-bottom:4px;\">İlk tarama — digest</div>\n    <h2 style=\"margin:0 0 6px 0;font-size:18px;\">Uygulama alanı ile eşleşen son 2 ayın ${posts.length} başlığı</h2>\n    <div style=\"color:#475569;font-size:13px;\">Bundan sonraki mail'ler yalnızca <b>yeni açılan</b> konular için tek tek gelecek.</div>\n  </div>\n\n  <table style=\"width:100%;border-collapse:collapse;font-size:14px;margin-top:20px;\">\n    ${rows}\n  </table>\n\n  <div style=\"margin-top:28px;padding-top:14px;border-top:1px solid #eee;color:#aaa;font-size:12px;\">\n    Checkpoint Mention Monitor · n8n · ${now}\n  </div>\n</body></html>`;\n  return [{ json: { subject, html, to: 'berk@storehealth.app' } }];\n}\n\n// ── SINGLE (normal run, yeni konu başına) ────────────────────────────────\nconst post = data.new;\nconst context = data.context || [];\nconst subject = `[Checkpoint Monitor] ${post.source}: ${post.title.slice(0, 90)}`;\nconst contextRows = context.map(buildRow).join('');\nconst html = `<!doctype html>\n<html><body style=\"font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:720px;margin:0 auto;padding:20px;color:#222;\">\n  <div style=\"background:#fff8e1;border-left:4px solid #f59e0b;padding:14px 18px;border-radius:4px;\">\n    <div style=\"font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:#b45309;margin-bottom:4px;\">Yeni konu tespit edildi</div>\n    <h2 style=\"margin:0 0 8px 0;font-size:20px;\"><a href=\"${esc(post.url)}\" style=\"color:#111;text-decoration:none;\">${esc(post.title)}</a></h2>\n    <div style=\"color:#666;font-size:13px;\">\n      <b>${esc(post.source)}</b> · ${esc(shortDate(post.createdAt))} · by ${esc(post.author)} · score ${post.score ?? '-'}\n    </div>\n    ${post.text ? `<div style=\"margin-top:12px;padding:10px 12px;background:#fff;border:1px solid #eee;border-radius:4px;font-size:14px;white-space:pre-wrap;\">${esc(post.text)}</div>` : ''}\n    <div style=\"margin-top:14px;\">\n      <a href=\"${esc(post.url)}\" style=\"display:inline-block;background:#111;color:#fff;padding:8px 14px;border-radius:6px;text-decoration:none;font-size:14px;\">Konuya git →</a>\n    </div>\n  </div>\n\n  <h3 style=\"margin:32px 0 8px 0;font-size:15px;color:#333;\">Son 2 ayın ilgili ${context.length} başlığı</h3>\n  <div style=\"color:#888;font-size:12px;margin-bottom:12px;\">Uygulama alanı ile eşleşen (son 60 gün)</div>\n  <table style=\"width:100%;border-collapse:collapse;font-size:14px;\">\n    ${contextRows}\n  </table>\n\n  <div style=\"margin-top:28px;padding-top:14px;border-top:1px solid #eee;color:#aaa;font-size:12px;\">\n    Checkpoint Mention Monitor · n8n · ${now}\n  </div>\n</body></html>`;\n\nreturn [{ json: { subject, html, to: 'berk@storehealth.app' } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [720, 300],
+      "id": "mm-0004",
+      "name": "Mail Body Hazırla"
+    },
+    {
+      "parameters": {
+        "fromEmail": "berk@storehealth.app",
+        "toEmail": "={{ $json.to }}",
+        "subject": "={{ $json.subject }}",
+        "emailFormat": "html",
+        "html": "={{ $json.html }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [960, 300],
+      "id": "mm-0005",
+      "name": "Mail Gönder"
+    },
+    {
+      "parameters": {
+        "content": "## 📬 Checkpoint Mention Monitor\n\n**Ne yapar:**\n- Her **15 dk** Reddit (tüm subreddit search) + Hacker News taranır\n- Belirlenmiş keyword regex'leri ile **strict match** yapılır\n- Daha önce görülmemiş her yeni konu için **berk@storehealth.app**'e mail atılır\n- Mail gövdesinde **yeni konu** + **son 2 ayın ilgili 50 başlığı** bulunur\n- Dedupe: n8n workflow static data (son 3000 ID)\n- Max mail/run: 15 (safety)\n\n**İlk çalıştırma:**\n- Tek **digest mail** gönderir: son 60 günde eşleşen ilk 50 başlık liste halinde\n- Tüm matched id'ler 'seen'e yazılır, `bootstrapped=true` set edilir\n- Bundan sonraki run'lar: yalnızca yeni açılan konular için **tek tek** mail\n\n**Sıfırlamak için:** n8n UI → Executions temizle DEĞİL; workflow'u `Deactivate → Save → Activate` yeterli değil. Static data reset için: workflow Settings → `Static Data` temizle (n8n sürümüne göre UI'da yok, o zaman `$getWorkflowStaticData('global')` içindeki `bootstrapped` ve `seenIds`'i ilk code node'a geçici bir `staticData.bootstrapped=false; staticData.seenIds=[];` satırı ekleyerek 1 kez çalıştır, sonra satırı sil).",
+        "height": 380,
+        "width": 420
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [0, -120],
+      "id": "mm-note-1",
+      "name": "Açıklama"
+    },
+    {
+      "parameters": {
+        "content": "## ⚙️ Kurulum\n\n### 1. Import\nn8n → Workflows → Import from File → `n8n/workflow-mention-monitor.json`\n\n### 2. SMTP credential bağla\n`Mail Gönder` node'una tıkla → Credentials → **Create new (SMTP)**\n\n**Google Workspace örneği:**\n- Host: `smtp.gmail.com`\n- Port: `465` (SSL) veya `587` (STARTTLS)\n- User: `berk@storehealth.app`\n- Password: **App Password** (Google Account → Security → 2FA → App passwords)\n- SSL/TLS: açık (port 465) veya STARTTLS (port 587)\n\nAlternatif: Resend, Postmark, SendGrid SMTP credential'ları da çalışır.\n\n### 3. Test\n- Workflow'u **inactive** tutarak `Kaynakları Tara` node'una sağ tık → Execute Node\n- Eşleşme varsa manuel çalıştırıp ilk mail'i al\n- Doğruysa **Active** yap\n\n### 4. Keyword'leri özelleştir\n`Kaynakları Tara` → `REDDIT_QUERY` & `HN_QUERIES`\n`Filtrele ve Dedupe` → `PATTERNS`\n\nYanlış pozitifler gelirse PATTERNS'i daralt, kaçırdıkların olursa genişlet.",
+        "height": 500,
+        "width": 440
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [440, -120],
+      "id": "mm-note-2",
+      "name": "Kurulum"
+    }
+  ],
+  "connections": {
+    "Her 15 Dakikada Bir": {
+      "main": [[{ "node": "Kaynakları Tara", "type": "main", "index": 0 }]]
+    },
+    "Kaynakları Tara": {
+      "main": [[{ "node": "Filtrele ve Dedupe", "type": "main", "index": 0 }]]
+    },
+    "Filtrele ve Dedupe": {
+      "main": [[{ "node": "Mail Body Hazırla", "type": "main", "index": 0 }]]
+    },
+    "Mail Body Hazırla": {
+      "main": [[{ "node": "Mail Gönder", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": false
+  }
+}

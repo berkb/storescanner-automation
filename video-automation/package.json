@@ -1,0 +1,29 @@
+{
+  "name": "checkpoint-video-automation",
+  "version": "1.0.0",
+  "description": "Daily video automation for Checkpoint: Store Scanner",
+  "scripts": {
+    "start": "npx remotion studio src/index.jsx",
+    "render": "node scripts/render.mjs",
+    "server": "node scripts/render-server.mjs",
+    "weekly": "node scripts/weekly-generate.mjs",
+    "weekly:dry": "node scripts/weekly-generate.mjs --dry-run",
+    "publish": "node scripts/publish-week.mjs",
+    "daily": "node scripts/daily-generate.mjs",
+    "daily:dry": "node scripts/daily-generate.mjs --dry-run",
+    "publish:daily": "node scripts/publish-daily.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.1015.0",
+    "@remotion/cli": "^4.0.438",
+    "@remotion/renderer": "^4.0.438",
+    "dotenv": "^16.6.1",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "remotion": "^4.0.438"
+  }
+}
