@@ -116,17 +116,6 @@
     }
   ],
   "connections": {
-    "Her Pazartesi 08:00": {
-      "main": [
-        [
-          {
-            "node": "7 Tip Video Render Et",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "7 Tip Video Render Et": {
       "main": [
         [
@@ -165,6 +154,17 @@
         [
           {
             "node": "Başarılı mı?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Her Gün 06:00": {
+      "main": [
+        [
+          {
+            "node": "7 Tip Video Render Et",
             "type": "main",
             "index": 0
           }
