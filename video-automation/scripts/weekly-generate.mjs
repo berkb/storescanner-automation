@@ -100,24 +100,16 @@ for (let i = 0; i < selected.length; i++) {
     continue;
   }
 
-  // Caption'ı Groq'a bırakmadan kodda üret (daily-generate.mjs gibi)
-  const hookText = script.screens.find(s => s.type === 'hook')?.text || topic.hook;
-  const bodyParts = script.screens
-    .filter(s => s.type === 'content')
-    .map(s => s.body)
-    .filter(Boolean);
-  const statScreen = script.screens.find(s => s.type === 'stat');
-  if (statScreen) bodyParts.push(`${statScreen.stat} ${statScreen.label}.`);
-  const bodyText = bodyParts.join(' ');
-  const appUrl   = 'https://apps.shopify.com/checkpoint-store-scanner';
-  const tags     = '#Shopify #ShopifyApps #Ecommerce #StoreAudit #CheckpointApp';
-  const socialCaption = `${hookText}\n\n${bodyText}\n\nPowered by Checkpoint: Store Scanner\n${tags}`;
+  // Groq caption'larını normalize et (satır başı boşlukları temizle)
+  function normalizeCaption(text) {
+    return (text || '').split('\n').map(l => l.trim()).join('\n').replace(/\n{3,}/g, '\n\n').trim();
+  }
   const captions = {
-    instagram: { caption: socialCaption },
-    tiktok:    { caption: socialCaption },
+    instagram: { caption: normalizeCaption(script.captions?.instagram?.caption) },
+    tiktok:    { caption: normalizeCaption(script.captions?.tiktok?.caption) },
     youtube: {
-      title:       (script.captions?.youtube?.title || `${topic.hook} | Checkpoint`).slice(0, 90),
-      description: `${hookText}\n\n${bodyText}\n\n${appUrl}\n\n${tags}`,
+      title:       (script.captions?.youtube?.title || topic.hook).slice(0, 90),
+      description: normalizeCaption(script.captions?.youtube?.description),
     },
   };
 

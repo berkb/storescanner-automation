@@ -44,11 +44,11 @@ Rules:
 - stat.label: max 5 words describing what the stat measures
 - stat.context: max 12 words explaining significance
 - youtube.title: max 90 chars, SEO-friendly, include "Checkpoint" or "Shopify"
-- youtube.description: 2-3 sentences (100-200 chars), then a blank line, then https://apps.shopify.com/checkpoint-store-scanner, then a blank line, then 5 relevant hashtags. Use \n for line breaks.
 - youtube.tags: 10-12 tags as array
-- tiktok.caption: hook sentence, then blank line, then 2-3 body sentences, then blank line, then 5-8 hashtags. 300-500 chars total. Use \n for line breaks.
-- instagram.caption: same structure as tiktok but slightly different angle. Use \n for line breaks.
-- No emojis except 1 max in tiktok/instagram caption
+- tiktok.caption: 1-2 natural sentences that mention "Checkpoint: Store Scanner" and embed the URL https://apps.shopify.com/checkpoint-store-scanner inline (not on its own line), then \n\n, then 5-8 topic-specific hashtags. Example: "After a theme update, use Checkpoint: Store Scanner to audit your store. https://apps.shopify.com/checkpoint-store-scanner Check for script errors and content gaps.\n\n#ShopifyApps #ThemeUpdate #Shopify"
+- instagram.caption: same style as tiktok but slightly different wording. Embed URL inline the same way.
+- youtube.description: same style as tiktok — 1-2 sentences with URL embedded inline, then \n\n, then 5-8 hashtags.
+- No emojis. No "Powered by" lines. No separate URL-only lines.
 - No quotes around values
 - All text in English`;
 
