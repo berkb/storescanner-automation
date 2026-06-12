@@ -109,7 +109,7 @@ export async function scheduleToBuffer({ videoPath, captions, publishAt }) {
       },
     },
     tiktok: {
-      text:     (captions.tiktok?.caption || '').slice(0, 150),
+      text:     (captions.tiktok?.caption || '').slice(0, 2200),
       metadata: {},
     },
   };
