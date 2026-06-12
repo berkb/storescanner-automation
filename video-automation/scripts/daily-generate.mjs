@@ -41,11 +41,12 @@ if (selected.length === 0) {
   process.exit(1);
 }
 
-// ─── Publish tarihi: bugün 11:00 UTC ─────────────────────────────────────────
+// ─── Publish tarihi: bugün 11:00 UTC, geçmişse yarın 11:00 UTC ───────────────
 function getPublishDates() {
-  const today = new Date();
-  today.setUTCHours(11, 0, 0, 0);
-  return [today.toISOString()];
+  const target = new Date();
+  target.setUTCHours(11, 0, 0, 0);
+  if (target <= new Date()) target.setUTCDate(target.getUTCDate() + 1);
+  return [target.toISOString()];
 }
 
 const publishDates = getPublishDates();

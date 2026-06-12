@@ -48,11 +48,12 @@ const defaultChime = chimeFile ? `sfx/${chimeFile}` : 'sfx/universfield-clear-be
 
 const pickRandom = arr => arr[Math.floor(Math.random() * arr.length)];
 
-// ─── Publish tarihi: bugün 16:00 UTC ─────────────────────────────────────────
+// ─── Publish tarihi: bugün 16:00 UTC, geçmişse yarın 16:00 UTC ───────────────
 function getPublishDates() {
-  const today = new Date();
-  today.setUTCHours(16, 0, 0, 0);
-  return [today.toISOString()];
+  const target = new Date();
+  target.setUTCHours(16, 0, 0, 0);
+  if (target <= new Date()) target.setUTCDate(target.getUTCDate() + 1);
+  return [target.toISOString()];
 }
 
 const publishDates = getPublishDates();
