@@ -160,17 +160,6 @@
     }
   ],
   "connections": {
-    "Her Pazartesi 10:30": {
-      "main": [
-        [
-          {
-            "node": "1 Video Render Et",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Render Sonucu Kontrol": {
       "main": [
         [
@@ -209,6 +198,17 @@
         [
           {
             "node": "Render Sonucu Kontrol",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Her Gün 07:00": {
+      "main": [
+        [
+          {
+            "node": "1 Video Render Et",
             "type": "main",
             "index": 0
           }
