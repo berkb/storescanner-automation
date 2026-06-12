@@ -7,7 +7,7 @@
           "interval": [
             {
               "field": "days",
-              "triggerAtHour": 9,
+              "triggerAtHour": 6,
               "triggerAtMinute": 0
             }
           ]
@@ -20,7 +20,7 @@
         0
       ],
       "id": "b2000001-0000-0000-0000-000000000001",
-      "name": "Her Gün 09:00"
+      "name": "Her Gün 06:00"
     },
     {
       "parameters": {
