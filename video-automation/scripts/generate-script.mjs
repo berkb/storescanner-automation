@@ -46,8 +46,8 @@ Rules:
 - youtube.title: max 90 chars, SEO-friendly, include "Checkpoint" or "Shopify"
 - youtube.description: 300-500 chars, include https://apps.shopify.com/checkpoint-store-scanner, end with 5 relevant hashtags
 - youtube.tags: 10-12 tags as array
-- tiktok.caption: max 150 chars including hashtags, hook first, end with 5 hashtags
-- instagram.caption: max 220 chars including hashtags, slightly different angle from tiktok
+- tiktok.caption: 300-500 chars, hook first, 2-3 sentences, end with 5-8 relevant hashtags on a new line
+- instagram.caption: 300-500 chars, slightly different angle from tiktok, end with 5-8 relevant hashtags on a new line
 - No emojis except 1 max in tiktok/instagram caption
 - No quotes around values
 - All text in English`;
