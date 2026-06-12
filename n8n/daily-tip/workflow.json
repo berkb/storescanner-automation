@@ -22,7 +22,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "http://127.0.0.1:3456/daily",
+        "url": "http://render-server:3456/daily",
         "options": { "timeout": 7200000 }
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -44,7 +44,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "http://127.0.0.1:3456/publish-daily",
+        "url": "http://render-server:3456/publish-daily",
         "options": { "timeout": 600000 }
       },
       "type": "n8n-nodes-base.httpRequest",
