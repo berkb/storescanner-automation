@@ -33,7 +33,7 @@
         300
       ],
       "id": "ww-0002",
-      "name": "7 Video Render Et"
+      "name": "1 Video Render Et"
     },
     {
       "parameters": {
@@ -156,18 +156,7 @@
       "main": [
         [
           {
-            "node": "7 Video Render Et",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "7 Video Render Et": {
-      "main": [
-        [
-          {
-            "node": "Render Sonucu Kontrol",
+            "node": "1 Video Render Et",
             "type": "main",
             "index": 0
           }
@@ -201,6 +190,17 @@
         [
           {
             "node": "Başarılı mı?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "1 Video Render Et": {
+      "main": [
+        [
+          {
+            "node": "Render Sonucu Kontrol",
             "type": "main",
             "index": 0
           }

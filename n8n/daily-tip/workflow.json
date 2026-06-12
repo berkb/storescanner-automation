@@ -37,7 +37,7 @@
         0
       ],
       "id": "b2000002-0000-0000-0000-000000000002",
-      "name": "7 Tip Video Render Et"
+      "name": "1 Tip Video Render Et"
     },
     {
       "parameters": {
@@ -116,17 +116,6 @@
     }
   ],
   "connections": {
-    "7 Tip Video Render Et": {
-      "main": [
-        [
-          {
-            "node": "Render Kontrol",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Render Kontrol": {
       "main": [
         [
@@ -164,7 +153,18 @@
       "main": [
         [
           {
-            "node": "7 Tip Video Render Et",
+            "node": "1 Tip Video Render Et",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "1 Tip Video Render Et": {
+      "main": [
+        [
+          {
+            "node": "Render Kontrol",
             "type": "main",
             "index": 0
           }
