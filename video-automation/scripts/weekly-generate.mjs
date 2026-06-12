@@ -100,6 +100,27 @@ for (let i = 0; i < selected.length; i++) {
     continue;
   }
 
+  // Caption'ı Groq'a bırakmadan kodda üret (daily-generate.mjs gibi)
+  const hookText = script.screens.find(s => s.type === 'hook')?.text || topic.hook;
+  const bodyParts = script.screens
+    .filter(s => s.type === 'content')
+    .map(s => s.body)
+    .filter(Boolean);
+  const statScreen = script.screens.find(s => s.type === 'stat');
+  if (statScreen) bodyParts.push(`${statScreen.stat} ${statScreen.label}.`);
+  const bodyText = bodyParts.join(' ');
+  const appUrl   = 'https://apps.shopify.com/checkpoint-store-scanner';
+  const tags     = '#Shopify #ShopifyApps #Ecommerce #StoreAudit #CheckpointApp';
+  const socialCaption = `${hookText}\n\n${bodyText}\n\nPowered by Checkpoint: Store Scanner\n${tags}`;
+  const captions = {
+    instagram: { caption: socialCaption },
+    tiktok:    { caption: socialCaption },
+    youtube: {
+      title:       (script.captions?.youtube?.title || `${topic.hook} | Checkpoint`).slice(0, 90),
+      description: `${hookText}\n\n${bodyText}\n\n${appUrl}\n\n${tags}`,
+    },
+  };
+
   const entry = {
     index:      i + 1,
     topicId:    topic.id,
@@ -109,7 +130,7 @@ for (let i = 0; i < selected.length; i++) {
     sfxWhoosh,
     sfxChime:   defaultChime,
     screens:    script.screens,
-    captions:   script.captions,
+    captions,
   };
 
   // Render et
