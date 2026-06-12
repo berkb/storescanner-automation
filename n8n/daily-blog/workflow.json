@@ -1,0 +1,121 @@
+{
+  "name": "Daily Blog Post",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "triggerAtHour": 9,
+              "triggerAtMinute": 0
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [0, 300],
+      "id": "blog-001",
+      "name": "Her Gün 09:00"
+    },
+    {
+      "parameters": {
+        "jsCode": "const now = new Date();\nconst start = new Date(now.getFullYear(), 0, 0);\nconst dayOfYear = Math.floor((now - start) / 86400000);\nconst cats = ['app', 'shopify-updates', 'shopify-tips'];\nreturn [{ json: { category: cats[dayOfYear % 3], today: now.toISOString().slice(0, 10) } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 300],
+      "id": "blog-002",
+      "name": "Konu Kategorisi Belirle"
+    },
+    {
+      "parameters": {
+        "jsCode": "const { category, today } = $input.first().json;\nconst topics = {\n  app: 'Write about one specific Checkpoint: Store Scanner use case. Checkpoint is a Shopify app that scans stores for hidden issues. Choose one problem: leftover app scripts after uninstall, broken product images, missing descriptions, expired discounts still showing, duplicate meta tags, or empty metafields causing display bugs.',\n  'shopify-updates': 'Write about one Shopify platform behavior or feature merchants should understand. Choose one: how app uninstalls leave code behind, Online Store 2.0 theme structure, Shopify Markets, metafields vs metaobjects, checkout extensibility, or how script tags work.',\n  'shopify-tips': 'Write one practical how-to for Shopify merchants. Choose one: pre-launch QA checklist, safe theme updates, cleaning up after app uninstalls, maintaining store performance over time, SEO audit basics, managing discounts safely, or keeping the product catalog consistent.'\n};\nconst sys = 'Write for a Shopify tools blog. Clear, direct, practical, no fluff. Audience: Shopify merchants and developers. Rules: title max 70 chars. Description: 1 sentence max 160 chars. Tags: 4-6 lowercase kebab-case strings. Slug: url-friendly from title. Content: 600-900 words Markdown with brief 2-3 sentence intro, then 5-7 sections with ## headings, lists where useful, final paragraph naturally mentions Checkpoint: Store Scanner with link https://apps.shopify.com/store-scanner-health-check. No emojis. No conclusion section. Output ONLY valid JSON with fields: title, description, tags, slug, content.';\nreturn [{ json: { category, today, groqBody: { model: 'llama-3.3-70b-versatile', messages: [{ role: 'system', content: sys }, { role: 'user', content: topics[category] }], max_tokens: 2500, temperature: 0.7 } } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 300],
+      "id": "blog-003",
+      "name": "Groq İsteği Hazırla"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "={{ 'Bearer ' + $env.GROQ_API_KEY }}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify($json.groqBody) }}"
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [660, 300],
+      "id": "blog-004",
+      "name": "Groq API"
+    },
+    {
+      "parameters": {
+        "jsCode": "const { today } = $('Konu Kategorisi Belirle').first().json;\nconst raw = $input.first().json.choices[0].message.content.trim();\nconst jsonStr = raw.replace(/^```json?\\n?/, '').replace(/\\n?```$/, '').trim();\nfunction sanitize(s) {\n  return s.replace(/\"(?:[^\"\\\\]|\\\\.)*\"/g, m => m.replace(/\\n/g, '\\\\n').replace(/\\r/g, '\\\\r').replace(/\\t/g, '\\\\t'));\n}\nlet post;\ntry { post = JSON.parse(sanitize(jsonStr)); } catch(e) { throw new Error('Groq parse error: ' + e.message + ' | Raw: ' + raw.slice(0, 300)); }\nconst fm = '---\\ntitle: \"' + post.title.replace(/\"/g, '\\\\\"') + '\"\\ndescription: \"' + post.description.replace(/\"/g, '\\\\\"') + '\"\\npublishDate: \"' + today + '\"\\ntags: [' + post.tags.map(t => '\"' + t + '\"').join(', ') + ']\\ndraft: false\\n---\\n\\n';\nconst markdown = fm + post.content;\nconst filePath = 'src/content/blog/' + post.slug + '.md';\nconst content = Buffer.from(markdown, 'utf8').toString('base64');\nreturn [{ json: { filePath, content, title: post.title, slug: post.slug } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [880, 300],
+      "id": "blog-005",
+      "name": "Markdown Dosyası Oluştur"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "={{ 'https://api.github.com/repos/berkb/storescanner-website/contents/' + $json.filePath }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "={{ 'Bearer ' + $env.GITHUB_TOKEN }}" },
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "X-GitHub-Api-Version", "value": "2022-11-28" }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ message: 'feat: add blog post - ' + $json.title, content: $json.content, branch: 'main' }) }}"
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1100, 300],
+      "id": "blog-006",
+      "name": "GitHub'a Commit Et"
+    }
+  ],
+  "connections": {
+    "Her Gün 09:00": {
+      "main": [[{ "node": "Konu Kategorisi Belirle", "type": "main", "index": 0 }]]
+    },
+    "Konu Kategorisi Belirle": {
+      "main": [[{ "node": "Groq İsteği Hazırla", "type": "main", "index": 0 }]]
+    },
+    "Groq İsteği Hazırla": {
+      "main": [[{ "node": "Groq API", "type": "main", "index": 0 }]]
+    },
+    "Groq API": {
+      "main": [[{ "node": "Markdown Dosyası Oluştur", "type": "main", "index": 0 }]]
+    },
+    "Markdown Dosyası Oluştur": {
+      "main": [[{ "node": "GitHub'a Commit Et", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}
