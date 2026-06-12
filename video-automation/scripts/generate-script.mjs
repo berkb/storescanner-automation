@@ -74,9 +74,16 @@ Rules:
   // JSON bloğunu çıkar (markdown code block varsa temizle)
   const jsonStr = raw.replace(/^```json?\n?/, '').replace(/\n?```$/, '').trim();
 
+  // String literal içindeki kontrol karakterlerini temizle (Groq bazen literal \n üretiyor)
+  function sanitizeJson(str) {
+    return str.replace(/"(?:[^"\\]|\\.)*"/g, m =>
+      m.replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/\t/g, '\\t')
+    );
+  }
+
   let script;
   try {
-    script = JSON.parse(jsonStr);
+    script = JSON.parse(sanitizeJson(jsonStr));
   } catch (e) {
     // Retry once on JSON parse failure
     const res2 = await fetch(GROQ_URL, {
@@ -97,7 +104,7 @@ Rules:
     const raw2   = data2.choices[0].message.content.trim();
     const json2  = raw2.replace(/^```json?\n?/, '').replace(/\n?```$/, '').trim();
     try {
-      script = JSON.parse(json2);
+      script = JSON.parse(sanitizeJson(json2));
     } catch (e2) {
       throw new Error(`Groq JSON parse hatası: ${e2.message}\nRaw: ${raw2.slice(0, 200)}`);
     }
