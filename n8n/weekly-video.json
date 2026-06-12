@@ -24,10 +24,14 @@
     },
     {
       "parameters": {
-        "command": "cd /Users/berkbelcioglu/GhostThemeAppScanner/video-automation && node scripts/weekly-generate.mjs 2>/tmp/weekly-render.log"
+        "method": "POST",
+        "url": "http://render-server:3456/weekly",
+        "options": {
+          "timeout": 7200000
+        }
       },
-      "type": "n8n-nodes-base.executeCommand",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
       "position": [
         240,
         300
@@ -50,10 +54,14 @@
     },
     {
       "parameters": {
-        "command": "cd /Users/berkbelcioglu/GhostThemeAppScanner/video-automation && node scripts/publish-week.mjs 2>/tmp/weekly-publish.log"
+        "method": "POST",
+        "url": "http://render-server:3456/publish",
+        "options": {
+          "timeout": 600000
+        }
       },
-      "type": "n8n-nodes-base.executeCommand",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
       "position": [
         720,
         300
