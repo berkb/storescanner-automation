@@ -44,10 +44,10 @@ Rules:
 - stat.label: max 5 words describing what the stat measures
 - stat.context: max 12 words explaining significance
 - youtube.title: max 90 chars, SEO-friendly, include "Checkpoint" or "Shopify"
-- youtube.description: 300-500 chars, include https://apps.shopify.com/checkpoint-store-scanner, end with 5 relevant hashtags
+- youtube.description: 2-3 sentences (100-200 chars), then a blank line, then https://apps.shopify.com/checkpoint-store-scanner, then a blank line, then 5 relevant hashtags. Use \n for line breaks.
 - youtube.tags: 10-12 tags as array
-- tiktok.caption: 300-500 chars, hook first, 2-3 sentences, end with 5-8 relevant hashtags on a new line
-- instagram.caption: 300-500 chars, slightly different angle from tiktok, end with 5-8 relevant hashtags on a new line
+- tiktok.caption: hook sentence, then blank line, then 2-3 body sentences, then blank line, then 5-8 hashtags. 300-500 chars total. Use \n for line breaks.
+- instagram.caption: same structure as tiktok but slightly different angle. Use \n for line breaks.
 - No emojis except 1 max in tiktok/instagram caption
 - No quotes around values
 - All text in English`;
