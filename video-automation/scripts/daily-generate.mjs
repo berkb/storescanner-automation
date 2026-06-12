@@ -34,7 +34,7 @@ if (allIds.every(id => state.used.includes(id))) {
   state.used = [];
 }
 const available = TIPS.filter(t => !state.used.includes(t.id));
-const selected  = available.slice(0, 1);
+const selected  = available.sort(() => Math.random() - 0.5).slice(0, 1);
 
 if (selected.length === 0) {
   process.stderr.write('❌ Kullanılabilir tip bulunamadı.\n');
