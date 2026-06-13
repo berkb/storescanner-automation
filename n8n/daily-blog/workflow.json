@@ -63,13 +63,23 @@
     },
     {
       "parameters": {
-        "jsCode": "const { today } = $('Konu Kategorisi Belirle').first().json;\nconst raw = $input.first().json.choices[0].message.content.trim();\nconst jsonStr = raw.replace(/^```json?\\n?/, '').replace(/\\n?```$/, '').trim();\nfunction sanitize(s) {\n  return s.replace(/\"(?:[^\"\\\\]|\\\\.)*\"/g, m => m.replace(/\\n/g, '\\\\n').replace(/\\r/g, '\\\\r').replace(/\\t/g, '\\\\t'));\n}\nlet post;\ntry { post = JSON.parse(sanitize(jsonStr)); } catch(e) { throw new Error('Groq parse error: ' + e.message + ' | Raw: ' + raw.slice(0, 300)); }\nconst fm = '---\\ntitle: \"' + post.title.replace(/\"/g, '\\\\\"') + '\"\\ndescription: \"' + post.description.replace(/\"/g, '\\\\\"') + '\"\\npublishDate: \"' + today + '\"\\ntags: [' + post.tags.map(t => '\"' + t + '\"').join(', ') + ']\\ndraft: false\\n---\\n\\n';\nconst markdown = fm + post.content;\nconst filePath = 'src/content/blog/' + post.slug + '.md';\nconst content = Buffer.from(markdown, 'utf8').toString('base64');\nreturn [{ json: { filePath, content, title: post.title, slug: post.slug } }];"
+        "jsCode": "const { category, today } = $('Konu Kategorisi Belirle').first().json;\nconst raw = $input.first().json.choices[0].message.content.trim();\nconst jsonStr = raw.replace(/^```json?\\n?/, '').replace(/\\n?```$/, '').trim();\nfunction sanitize(s) {\n  return s.replace(/\"(?:[^\"\\\\]|\\\\.)*\"/g, m => m.replace(/\\n/g, '\\\\n').replace(/\\r/g, '\\\\r').replace(/\\t/g, '\\\\t'));\n}\nlet post;\ntry { post = JSON.parse(sanitize(jsonStr)); } catch(e) { throw new Error('Groq parse error: ' + e.message + ' | Raw: ' + raw.slice(0, 300)); }\nconst filePath = 'src/content/blog/' + post.slug + '.md';\nreturn [{ json: { title: post.title, description: post.description, slug: post.slug, tags: post.tags, content: post.content, category, today, filePath } }];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [880, 300],
       "id": "blog-005",
-      "name": "Markdown Dosyası Oluştur"
+      "name": "Groq Ayrıştır"
+    },
+    {
+      "parameters": {
+        "jsCode": "const { title, description, slug, tags, content, category, today, filePath } = $input.first().json;\nlet ogImageUrl = '';\ntry {\n  const res = await fetch('http://carousel-server:3457/generate-og-image', {\n    method: 'POST',\n    headers: { 'Content-Type': 'application/json' },\n    body: JSON.stringify({ title, description, category, slug }),\n  });\n  if (res.ok) {\n    const data = await res.json();\n    ogImageUrl = data.url || '';\n  }\n} catch(e) {}\nconst ogImageLine = ogImageUrl ? '\\nogImage: \"' + ogImageUrl + '\"' : '';\nconst fm = '---\\ntitle: \"' + title.replace(/\"/g, '\\\\\"') + '\"\\ndescription: \"' + description.replace(/\"/g, '\\\\\"') + '\"\\npublishDate: \"' + today + '\"\\ntags: [' + tags.map(t => '\"' + t + '\"').join(', ') + ']\\ndraft: false' + ogImageLine + '\\n---\\n\\n';\nconst markdown = fm + content;\nconst encoded = Buffer.from(markdown, 'utf8').toString('base64');\nreturn [{ json: { filePath, content: encoded, title } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1100, 300],
+      "id": "blog-007",
+      "name": "OG Görsel ve Markdown"
     },
     {
       "parameters": {
@@ -90,7 +100,7 @@
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1100, 300],
+      "position": [1320, 300],
       "id": "blog-006",
       "name": "GitHub'a Commit Et"
     }
@@ -106,9 +116,12 @@
       "main": [[{ "node": "Groq API", "type": "main", "index": 0 }]]
     },
     "Groq API": {
-      "main": [[{ "node": "Markdown Dosyası Oluştur", "type": "main", "index": 0 }]]
+      "main": [[{ "node": "Groq Ayrıştır", "type": "main", "index": 0 }]]
     },
-    "Markdown Dosyası Oluştur": {
+    "Groq Ayrıştır": {
+      "main": [[{ "node": "OG Görsel ve Markdown", "type": "main", "index": 0 }]]
+    },
+    "OG Görsel ve Markdown": {
       "main": [[{ "node": "GitHub'a Commit Et", "type": "main", "index": 0 }]]
     }
   },

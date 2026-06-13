@@ -22,6 +22,7 @@ import puppeteer from 'puppeteer';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import dotenv from 'dotenv';
 import { buildCarouselHtml, CAROUSEL_PAGE_SIZE } from './carousel-template.mjs';
+import { buildOgImageHtml } from './og-image-template.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
@@ -144,6 +145,34 @@ function sendJson(res, status, payload) {
 const server = http.createServer(async (req, res) => {
   if (req.method === 'GET' && req.url === '/health') {
     return sendJson(res, 200, { ok: true, port: PORT });
+  }
+
+  if (req.method === 'POST' && req.url === '/generate-og-image') {
+    let payload;
+    try { payload = await readJson(req); } catch (e) {
+      return sendJson(res, 400, { error: 'Invalid JSON', detail: String(e) });
+    }
+    const { title, description, category, slug } = payload || {};
+    if (!title || !description) return sendJson(res, 400, { error: 'title and description required' });
+
+    try {
+      const html = buildOgImageHtml({ title, description, category });
+      const browser = await getBrowser();
+      const page = await browser.newPage();
+      await page.setViewport({ width: 1200, height: 630, deviceScaleFactor: 2 });
+      await page.setContent(html, { waitUntil: 'networkidle0', timeout: 30000 });
+      if (await page.evaluate(() => !!document.fonts)) await page.evaluate(() => document.fonts.ready);
+      const buf = await page.screenshot({ type: 'png', clip: { x: 0, y: 0, width: 1200, height: 630 } });
+      await page.close();
+
+      const key = `og-images/${slug || 'post'}-${crypto.randomBytes(4).toString('hex')}.png`;
+      const url = await uploadToR2({ key, body: buf, contentType: 'image/png' });
+      console.log(`[carousel-server] og:image → ${url}`);
+      return sendJson(res, 200, { url });
+    } catch (err) {
+      console.error('[carousel-server] og:image failed:', err);
+      return sendJson(res, 500, { error: 'og:image render failed', detail: String(err?.message || err) });
+    }
   }
 
   if (req.method !== 'POST' || req.url !== '/generate-carousel') {
