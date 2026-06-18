@@ -1,7 +1,7 @@
 {
   "name": "checkpoint-video-automation",
   "version": "1.0.0",
-  "description": "Daily video automation for Checkpoint: Store Scanner",
+  "description": "Daily video automation for Store Health: Audit & Scan",
   "scripts": {
     "start": "npx remotion studio src/index.jsx",
     "render": "node scripts/render.mjs",

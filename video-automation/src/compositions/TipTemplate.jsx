@@ -84,7 +84,7 @@ const TopBar = ({ tipNumber, category, frame }) => {
           fontWeight: 700,
           color: B.muted,
           letterSpacing: -0.3,
-        }}>Checkpoint: Store Scanner</span>
+        }}>Store Health: Audit & Scan</span>
       </div>
 
       {/* Tip badge */}

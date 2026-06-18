@@ -30,7 +30,7 @@ function brandBlock({ dark = false } = {}) {
       <span class="brand-label" style="color:${labelColor};">Powered by</span>
       <div class="brand-row">
         <div class="brand-dot"></div>
-        <span class="brand-name">Checkpoint: Store Scanner</span>
+        <span class="brand-name">Store Health: Audit & Scan</span>
       </div>
     </div>
   `;

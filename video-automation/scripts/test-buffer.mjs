@@ -7,7 +7,7 @@ const results = await scheduleToBuffer({
   captions: {
     youtube: {
       title: 'You Uninstalled the App. The Code Is Still Loading. | Checkpoint',
-      description: `Every Shopify app you install leaves code behind — even after you remove it. Ghost scripts keep loading on every page visit, slowing your store and hurting conversions.\n\nCheckpoint: Store Scanner detects every orphaned script.\n\nhttps://apps.shopify.com/checkpoint-store-scanner\n\n#shopify #shopifytips #ecommerce #pagespeed`,
+      description: `Every Shopify app you install leaves code behind — even after you remove it. Ghost scripts keep loading on every page visit, slowing your store and hurting conversions.\n\nStore Health: Audit & Scan detects every orphaned script.\n\nhttps://apps.shopify.com/checkpoint-store-scanner\n\n#shopify #shopifytips #ecommerce #pagespeed`,
     },
     tiktok: {
       caption: "You removed the app. The code stayed. 👻\n\nGhost scripts from uninstalled Shopify apps slow your store silently.\n\nCheckpoint finds every one.\n\n#shopify #shopifytips #ecommerce #pagespeed #shopifyapp",

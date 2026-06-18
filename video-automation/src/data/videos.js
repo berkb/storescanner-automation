@@ -1,10 +1,10 @@
-// ─── Video Scripts for Checkpoint: Store Scanner ─────────────────────────────
+// ─── Video Scripts for Store Health: Audit & Scan ─────────────────────────────
 // Each screen: { type, duration (seconds), ...data }
 // Types: hook | content | stat | list-item | cta
 // Max 10s per screen. Total 30-60s per video.
 
 export const CTA_DEFAULTS = {
-  appName: 'Checkpoint: Store Scanner',
+  appName: 'Store Health: Audit & Scan',
   url: 'apps.shopify.com/checkpoint-store-scanner',
 };
 

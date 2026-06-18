@@ -29,7 +29,7 @@ const themes = [
 
 const theme = themes[weekNumber % themes.length];
 
-const prompt = `You are a growth strategist for a Shopify app called Checkpoint: Store Scanner. Audience: Shopify merchants and agencies. Tone: clear, direct, no hype. No emojis. No em dashes.
+const prompt = `You are a growth strategist for a Shopify app called Store Health: Audit & Scan. Audience: Shopify merchants and agencies. Tone: clear, direct, no hype. No emojis. No em dashes.
 
 This week's focus angle: ${theme.angle}
 Real example to reference: ${theme.example}

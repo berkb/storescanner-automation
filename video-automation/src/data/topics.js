@@ -1,7 +1,7 @@
 /**
  * topics.js
  *
- * Checkpoint: Store Scanner için video konu havuzu.
+ * Store Health: Audit & Scan için video konu havuzu.
  * Her konu benzersiz bir ID'ye ve Groq'a verilecek bağlama sahip.
  * Kullanılan konular state/used-topics.json'da takip edilir.
  */

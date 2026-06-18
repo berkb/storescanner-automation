@@ -84,7 +84,7 @@ const LogoBar = () => {
         fontWeight: 700,
         color: BRAND.text,
         letterSpacing: -0.5,
-      }}>Checkpoint: Store Scanner</span>
+      }}>Store Health: Audit & Scan</span>
     </div>
   );
 };

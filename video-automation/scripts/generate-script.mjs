@@ -8,7 +8,7 @@
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
 export async function generateScript(topic) {
-  const prompt = `You are writing content for a 30-45 second vertical video about Checkpoint: Store Scanner, a Shopify app that audits stores for hidden issues.
+  const prompt = `You are writing content for a 30-45 second vertical video about Store Health: Audit & Scan, a Shopify app that audits stores for hidden issues.
 
 Topic: ${topic.id}
 Hook: ${topic.hook}
@@ -45,7 +45,7 @@ Rules:
 - stat.context: max 12 words explaining significance
 - youtube.title: max 90 chars, SEO-friendly, include "Checkpoint" or "Shopify"
 - youtube.tags: 10-12 tags as array
-- tiktok.caption: 1-2 natural sentences that mention "Checkpoint: Store Scanner" and embed the URL https://apps.shopify.com/checkpoint-store-scanner inline (not on its own line), then \n\n, then 5-8 topic-specific hashtags. Example: "After a theme update, use Checkpoint: Store Scanner to audit your store. https://apps.shopify.com/checkpoint-store-scanner Check for script errors and content gaps.\n\n#ShopifyApps #ThemeUpdate #Shopify"
+- tiktok.caption: 1-2 natural sentences that mention "Store Health: Audit & Scan" and embed the URL https://apps.shopify.com/checkpoint-store-scanner inline (not on its own line), then \n\n, then 5-8 topic-specific hashtags. Example: "After a theme update, use Store Health: Audit & Scan to audit your store. https://apps.shopify.com/checkpoint-store-scanner Check for script errors and content gaps.\n\n#ShopifyApps #ThemeUpdate #Shopify"
 - instagram.caption: same style as tiktok but slightly different wording. Embed URL inline the same way.
 - youtube.description: same style as tiktok — 1-2 sentences with URL embedded inline, then \n\n, then 5-8 hashtags.
 - No emojis. No "Powered by" lines. No separate URL-only lines.

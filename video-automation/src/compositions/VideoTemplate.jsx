@@ -138,7 +138,7 @@ const LogoBar = ({ opacity = 1 }) => (
       color: BRAND.text,
       letterSpacing: -0.3,
       opacity: 0.9,
-    }}>Checkpoint: Store Scanner</span>
+    }}>Store Health: Audit & Scan</span>
   </div>
 );
 
