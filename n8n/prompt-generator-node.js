@@ -7,22 +7,22 @@ const weekNumber = Math.ceil((((now - new Date(now.getFullYear(), 0, 1)) / 86400
 const themes = [
   {
     angle: "unused scripts and performance impact after app changes",
-    example: "A store had 4 unused third-party scripts slowing checkout. Checkpoint detected them in one scan.",
+    example: "A store had 4 unused third-party scripts slowing checkout. Store Health detected them in one scan.",
     question: "How do I know if uninstalled apps left scripts behind?"
   },
   {
     angle: "agency post-launch QA workflow and client handoff quality",
-    example: "An agency used Checkpoint after every theme deployment to catch leftover code before client sign-off.",
+    example: "An agency used Store Health after every theme deployment to catch leftover code before client sign-off.",
     question: "What should agencies check after a Shopify theme launch?"
   },
   {
     angle: "theme cleanup and leftover fragments from old apps",
-    example: "A merchant found 6 theme fragments from apps uninstalled 6 months ago. All flagged by Checkpoint.",
+    example: "A merchant found 6 theme fragments from apps uninstalled 6 months ago. All flagged by Store Health.",
     question: "Do unused theme sections affect store speed?"
   },
   {
     angle: "product and discount health gaps affecting conversion",
-    example: "Checkpoint found 12 products with missing descriptions and 3 broken discount codes in one scan.",
+    example: "Store Health found 12 products with missing descriptions and 3 broken discount codes in one scan.",
     question: "What product data issues most affect conversion rates?"
   }
 ];

@@ -14,7 +14,7 @@
   "messages": [
     {
       "role": "user",
-      "content": "You are a growth strategist for a Shopify app called Store Health: Audit & Scan. Audience: Shopify merchants and agencies. Tone: clear, direct, no hype. No emojis. No em dashes. Output EXACTLY in this format with these labels: LINKEDIN_1: [post text] LINKEDIN_2: [post text] X_1: [post text] X_2: [post text] X_3: [post text] REDDIT: [value-first post, not salesy, with title] OUTREACH_DM: [warm short agency DM] FAQ: [2-4 sentence answer to a common question] Each post must have one CTA. Max 4 hashtags where relevant. App: Checkpoint Store Scanner detects hidden Shopify store health issues after theme/app changes. Scans for unused scripts, theme leftovers, performance issues, product/discount gaps, prioritizes fixes by impact."
+      "content": "You are a growth strategist for a Shopify app called Store Health: Audit & Scan. Audience: Shopify merchants and agencies. Tone: clear, direct, no hype. No emojis. No em dashes. Output EXACTLY in this format with these labels: LINKEDIN_1: [post text] LINKEDIN_2: [post text] X_1: [post text] X_2: [post text] X_3: [post text] REDDIT: [value-first post, not salesy, with title] OUTREACH_DM: [warm short agency DM] FAQ: [2-4 sentence answer to a common question] Each post must have one CTA. Max 4 hashtags where relevant. App: Store Health: Audit & Scan detects hidden Shopify store health issues after theme/app changes. Scans for unused scripts, theme leftovers, performance issues, product/discount gaps, prioritizes fixes by impact."
     }
   ],
   "max_tokens": 2000

@@ -1,5 +1,5 @@
 const CATEGORY_COLORS = {
-  app:              { bg: '#B9FF66', text: '#191A23', label: 'Checkpoint App' },
+  app:              { bg: '#B9FF66', text: '#191A23', label: 'Store Health App' },
   'shopify-updates': { bg: '#60a5fa', text: '#ffffff', label: 'Shopify Updates' },
   'shopify-tips':    { bg: '#38d6c6', text: '#191A23', label: 'Shopify Tips'    },
 };

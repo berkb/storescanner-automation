@@ -6,7 +6,7 @@ export const CAPTIONS = {
 
 Store Health: Audit & Scan automatically detects orphaned and leftover scripts from uninstalled apps, so you can clean up your theme and get back to running a fast, reliable store.
 
-In this video, we show you exactly how leftover app scripts accumulate, what damage they cause, and how Checkpoint surfaces them in seconds.
+In this video, we show you exactly how leftover app scripts accumulate, what damage they cause, and how Store Healthsurfaces them in seconds.
 
 Try Store Health: Audit & Scan free on the Shopify App Store:
 https://apps.shopify.com/checkpoint-store-scanner
@@ -23,7 +23,7 @@ https://apps.shopify.com/checkpoint-store-scanner
         'shopify orphaned scripts',
         'shopify ecommerce tips',
         'shopify store scanner',
-        'checkpoint shopify',
+        'Store Healthshopify',
         'shopify performance',
         'shopify developer tips',
         'ecommerce optimization',
@@ -61,7 +61,7 @@ Try it free — link in bio.
 
 Store Health: Audit & Scan scans your entire product catalog for broken, missing, or unoptimized images so you can fix them before they impact your revenue.
 
-This video walks through why broken product images happen, how they affect your conversion rate, and how Checkpoint makes it effortless to find every affected product in one place.
+This video walks through why broken product images happen, how they affect your conversion rate, and how Store Healthmakes it effortless to find every affected product in one place.
 
 Try Store Health: Audit & Scan free on the Shopify App Store:
 https://apps.shopify.com/checkpoint-store-scanner
@@ -77,7 +77,7 @@ https://apps.shopify.com/checkpoint-store-scanner
         'ecommerce product images',
         'shopify conversion rate',
         'shopify store scanner',
-        'checkpoint shopify',
+        'Store Healthshopify',
         'shopify tips',
         'shopify ecommerce',
         'fix broken images shopify',
@@ -116,7 +116,7 @@ Try it free — link in bio.
 
 Store Health: Audit & Scan analyzes your store for the most common speed bottlenecks — from heavy scripts and unoptimized images to render-blocking code — and gives you a clear, actionable report.
 
-In this video, we break down the most common causes of slow Shopify stores and show you how Checkpoint helps you prioritize what to fix first.
+In this video, we break down the most common causes of slow Shopify stores and show you how Store Healthhelps you prioritize what to fix first.
 
 Try Store Health: Audit & Scan free on the Shopify App Store:
 https://apps.shopify.com/checkpoint-store-scanner
@@ -132,7 +132,7 @@ https://apps.shopify.com/checkpoint-store-scanner
         'shopify core web vitals',
         'shopify store optimization',
         'shopify app',
-        'checkpoint shopify',
+        'Store Healthshopify',
         'ecommerce performance',
         'shopify tips',
         'shopify conversion rate',
@@ -171,7 +171,7 @@ Try it free — link in bio.
 
 Store Health: Audit & Scan audits every product, collection, and page in your store for missing or incomplete SEO metadata, so you can close the gaps and start ranking.
 
-This video covers the most common SEO metadata mistakes on Shopify stores and shows you how Checkpoint makes a full SEO audit fast and straightforward.
+This video covers the most common SEO metadata mistakes on Shopify stores and shows you how Store Healthmakes a full SEO audit fast and straightforward.
 
 Try Store Health: Audit & Scan free on the Shopify App Store:
 https://apps.shopify.com/checkpoint-store-scanner
@@ -188,7 +188,7 @@ https://apps.shopify.com/checkpoint-store-scanner
         'shopify store optimization',
         'fix shopify SEO',
         'shopify app',
-        'checkpoint shopify',
+        'Store Healthshopify',
         'shopify product SEO',
         'ecommerce optimization',
         'shopify search ranking',
@@ -226,7 +226,7 @@ Try it free — link in bio.
 
 Store Health: Audit & Scan reviews your active discount codes for common configuration issues so you can fix problems before your customers encounter them.
 
-In this video, we walk through the most common reasons discount codes break on Shopify and show you how Checkpoint helps you run a cleaner, more reliable promotions setup.
+In this video, we walk through the most common reasons discount codes break on Shopify and show you how Store Healthhelps you run a cleaner, more reliable promotions setup.
 
 Try Store Health: Audit & Scan free on the Shopify App Store:
 https://apps.shopify.com/checkpoint-store-scanner
@@ -240,7 +240,7 @@ https://apps.shopify.com/checkpoint-store-scanner
         'fix shopify discount codes',
         'shopify store audit',
         'shopify app',
-        'checkpoint shopify',
+        'Store Healthshopify',
         'ecommerce discounts',
         'shopify tips',
         'shopify sale strategy',
@@ -281,7 +281,7 @@ Try it free — link in bio.
 
 Store Health: Audit & Scan scans your entire product catalog for duplicate variants so you can identify and resolve them before they cause bigger problems downstream.
 
-This video explains how duplicate variants occur, what issues they cause, and how Checkpoint helps you audit your catalog quickly and accurately.
+This video explains how duplicate variants occur, what issues they cause, and how Store Healthhelps you audit your catalog quickly and accurately.
 
 Try Store Health: Audit & Scan free on the Shopify App Store:
 https://apps.shopify.com/checkpoint-store-scanner
@@ -296,7 +296,7 @@ https://apps.shopify.com/checkpoint-store-scanner
         'shopify store optimization',
         'shopify product management',
         'shopify app',
-        'checkpoint shopify',
+        'Store Healthshopify',
         'ecommerce product catalog',
         'shopify tips',
         'shopify bulk import issues',
@@ -336,7 +336,7 @@ Try it free — link in bio.
 
 Store Health: Audit & Scan scans your entire store for images missing alt text and surfaces them in a clear, prioritized list so you can fix the issue efficiently.
 
-This video breaks down why alt text matters for both SEO and accessibility, and shows you how Checkpoint makes it easy to find and resolve the gaps across your entire product catalog.
+This video breaks down why alt text matters for both SEO and accessibility, and shows you how Store Healthmakes it easy to find and resolve the gaps across your entire product catalog.
 
 Try Store Health: Audit & Scan free on the Shopify App Store:
 https://apps.shopify.com/checkpoint-store-scanner
@@ -352,7 +352,7 @@ https://apps.shopify.com/checkpoint-store-scanner
         'shopify SEO tips',
         'shopify store audit',
         'shopify app',
-        'checkpoint shopify',
+        'Store Healthshopify',
         'fix shopify alt text',
         'ecommerce SEO',
         'shopify image optimization',
@@ -391,7 +391,7 @@ Try it free — link in bio.
 
 Store Health: Audit & Scan identifies unused and orphaned metafields across your store so you can understand what's there, what's still in use, and what's safe to remove.
 
-This video explains what metafields are, how clutter builds up, and how Checkpoint gives you a clear view of your store's metafield health.
+This video explains what metafields are, how clutter builds up, and how Store Healthgives you a clear view of your store's metafield health.
 
 Try Store Health: Audit & Scan free on the Shopify App Store:
 https://apps.shopify.com/checkpoint-store-scanner
@@ -405,7 +405,7 @@ https://apps.shopify.com/checkpoint-store-scanner
         'shopify developer tips',
         'shopify store audit',
         'shopify app',
-        'checkpoint shopify',
+        'Store Healthshopify',
         'shopify data management',
         'ecommerce backend',
         'shopify tips',
@@ -446,7 +446,7 @@ Try it free — link in bio.
 
 Store Health: Audit & Scan audits your theme for common code debt indicators, from unused snippets and dead sections to lingering app code, so you can understand the state of your theme and prioritize a cleanup.
 
-This video explains what theme code debt is, how it accumulates, and how Checkpoint gives you the visibility to address it before it becomes a major problem.
+This video explains what theme code debt is, how it accumulates, and how Store Healthgives you the visibility to address it before it becomes a major problem.
 
 Try Store Health: Audit & Scan free on the Shopify App Store:
 https://apps.shopify.com/checkpoint-store-scanner
@@ -462,7 +462,7 @@ https://apps.shopify.com/checkpoint-store-scanner
         'clean shopify theme',
         'shopify store optimization',
         'shopify app',
-        'checkpoint shopify',
+        'Store Healthshopify',
         'shopify dead code',
         'shopify theme snippets',
         'ecommerce performance',
@@ -501,7 +501,7 @@ Try it free — link in bio.
 
 Store Health: Audit & Scan gives you a complete store health audit in minutes, covering all the major categories you need to verify before going live: speed, SEO, images, code quality, discounts, and more.
 
-This video walks through the essential pre-launch checklist for any Shopify store and shows you how Checkpoint makes it fast to complete.
+This video walks through the essential pre-launch checklist for any Shopify store and shows you how Store Healthmakes it fast to complete.
 
 Try Store Health: Audit & Scan free on the Shopify App Store:
 https://apps.shopify.com/checkpoint-store-scanner
@@ -516,7 +516,7 @@ https://apps.shopify.com/checkpoint-store-scanner
         'shopify store optimization',
         'shopify agency',
         'shopify app',
-        'checkpoint shopify',
+        'Store Healthshopify',
         'ecommerce launch checklist',
         'shopify tips',
         'shopify store audit',
