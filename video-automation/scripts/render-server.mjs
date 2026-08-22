@@ -18,13 +18,25 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
 const PORT = 3456;
 
-function runScript(args, res) {
+// Bu sunucu tek bir Chrome/Remotion render'ı kaldırabiliyor — aynı anda
+// ikinci bir job (n8n retry, çakışan cron, elle tetikleme) CPU'yu paylaşıp
+// ikisini de sürüncemede bırakıyordu. Tek seferde bir job kilidi.
+let activeJob = null;
+
+function busyResponse(res) {
+  res.writeHead(409, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify({ error: `Another job is already running: ${activeJob}` }));
+}
+
+function runScript(jobName, args, res) {
+  activeJob = jobName;
   let stdout = '';
   let stderr = '';
   const proc = spawn('node', args, { cwd: ROOT });
   proc.stdout.on('data', d => { stdout += d; process.stdout.write(d); });
   proc.stderr.on('data', d => { stderr += d; process.stderr.write(d); });
   proc.on('close', code => {
+    activeJob = null;
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ exitCode: code, stdout, stderr }));
   });
@@ -32,26 +44,30 @@ function runScript(args, res) {
 
 const server = http.createServer((req, res) => {
   if (req.method === 'POST' && req.url === '/weekly') {
+    if (activeJob) return busyResponse(res);
     console.log('[render-server] Starting weekly-generate.mjs');
-    runScript(['scripts/weekly-generate.mjs'], res);
+    runScript('weekly-generate', ['scripts/weekly-generate.mjs'], res);
     return;
   }
 
   if (req.method === 'POST' && req.url === '/publish') {
+    if (activeJob) return busyResponse(res);
     console.log('[render-server] Starting publish-week.mjs');
-    runScript(['scripts/publish-week.mjs'], res);
+    runScript('publish-week', ['scripts/publish-week.mjs'], res);
     return;
   }
 
   if (req.method === 'POST' && req.url === '/daily') {
+    if (activeJob) return busyResponse(res);
     console.log('[render-server] Starting daily-generate.mjs');
-    runScript(['scripts/daily-generate.mjs'], res);
+    runScript('daily-generate', ['scripts/daily-generate.mjs'], res);
     return;
   }
 
   if (req.method === 'POST' && req.url === '/publish-daily') {
+    if (activeJob) return busyResponse(res);
     console.log('[render-server] Starting publish-daily.mjs');
-    runScript(['scripts/publish-daily.mjs'], res);
+    runScript('publish-daily', ['scripts/publish-daily.mjs'], res);
     return;
   }
 
@@ -60,6 +76,8 @@ const server = http.createServer((req, res) => {
     res.end(JSON.stringify({ error: 'POST /render | /weekly | /publish only' }));
     return;
   }
+
+  if (activeJob) return busyResponse(res);
 
   let body = '';
   req.on('data', chunk => { body += chunk; });
@@ -79,6 +97,7 @@ const server = http.createServer((req, res) => {
     fs.writeFileSync(propsFile, JSON.stringify(props));
 
     console.log(`[render-server] Starting render → ${outputPath}`);
+    activeJob = 'render';
 
     const proc = spawn('node', [
       'scripts/render.mjs',
@@ -87,6 +106,7 @@ const server = http.createServer((req, res) => {
     ], { cwd: ROOT, stdio: 'inherit' });
 
     proc.on('close', code => {
+      activeJob = null;
       fs.rmSync(propsFile, { force: true });
       if (code === 0 && fs.existsSync(outputPath)) {
         console.log(`[render-server] Done: ${outputPath}`);
