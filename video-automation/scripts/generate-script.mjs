@@ -61,7 +61,7 @@ Rules:
     body: JSON.stringify({
       model:       'openai/gpt-oss-120b',
       messages:    [{ role: 'user', content: prompt }],
-      max_tokens:  1200,
+      max_tokens:  3000,
       temperature: 0.7,
     }),
   });
@@ -95,7 +95,7 @@ Rules:
       body: JSON.stringify({
         model:       'openai/gpt-oss-120b',
         messages:    [{ role: 'user', content: prompt }],
-        max_tokens:  1200,
+        max_tokens:  3000,
         temperature: 0.4,
       }),
     });
